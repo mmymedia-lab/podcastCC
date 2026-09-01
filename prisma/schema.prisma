@@ -11,10 +11,18 @@ datasource db {
 }
 
 // Prisma requires at least one model to generate a client. This one exists
-// solely so the deploy pipeline (this issue) has a real migration to run
+// solely so the deploy pipeline (issue #1) has a real migration to run
 // and a query to prove connectivity to the dedicated app database — it is
 // not a business entity from PRD.md.
 model HealthCheck {
   id        Int      @id @default(autoincrement())
   checkedAt DateTime @default(now())
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
 }
