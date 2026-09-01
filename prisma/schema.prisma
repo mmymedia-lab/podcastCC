@@ -1,0 +1,20 @@
+// Business models are added incrementally as each PRD.md slice is
+// implemented (see GitHub issues #2 onward).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Prisma requires at least one model to generate a client. This one exists
+// solely so the deploy pipeline (this issue) has a real migration to run
+// and a query to prove connectivity to the dedicated app database — it is
+// not a business entity from PRD.md.
+model HealthCheck {
+  id        Int      @id @default(autoincrement())
+  checkedAt DateTime @default(now())
+}

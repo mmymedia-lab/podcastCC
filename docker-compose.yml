@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: podcastcc
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: podcastcc
+    volumes:
+      - podcastcc_db_data:/var/lib/postgresql/data
+    networks:
+      - podcastcc
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      - podcastcc
+
+  migrate:
+    build: .
+    command: npx prisma migrate deploy
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      - podcastcc
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - podcastcc_caddy_data:/data
+    networks:
+      - podcastcc
+
+networks:
+  podcastcc:
+
+volumes:
+  podcastcc_db_data:
+  podcastcc_caddy_data:
