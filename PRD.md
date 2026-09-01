@@ -27,6 +27,13 @@ Aplikasi mendukung dua mode skala pengguna yang dipilih via pengaturan:
 
 Aplikasi **tidak** menggantikan tools yang sudah baik di tugasnya (Google Docs untuk naskah panjang, Canva untuk desain cover, software editing audio/video) — hanya menyimpan link ke aset-aset itu.
 
+Di tiga titik yang paling sering butuh "mancing ide", aplikasi menyediakan bantuan AI (Gemini API) sebagai tombol opsional yang dipicu manual oleh pengguna — bukan proses otomatis/background:
+- **Bank Tema** — generate beberapa ide topik turunan dari satu kata kunci/kategori
+- **Riset & Outline** — draft awal poin bicara atau daftar pertanyaan narasumber dari judul tema
+- **Pasca-Produksi** — draft show notes dari outline yang sudah ada
+
+Hasil AI selalu berupa draft yang harus ditinjau/diedit manual sebelum disimpan sebagai data final — tidak pernah langsung menimpa data tanpa konfirmasi pengguna.
+
 ## User Stories
 
 ### Autentikasi & Pengaturan Mode
@@ -69,6 +76,12 @@ Aplikasi **tidak** menggantikan tools yang sudah baik di tugasnya (Google Docs u
 23. Sebagai pengguna, saya bisa menulis catatan evaluasi bebas untuk satu episode setelah publish (apa yang berjalan baik/kurang).
 24. Sebagai pengguna, saya bisa mencatat ide follow-up yang otomatis bisa diangkat jadi ide baru di Bank Tema.
 
+### Bantuan AI (Gemini API)
+27. Sebagai pengguna, di halaman Bank Tema saya bisa menekan tombol "Minta ide AI", memasukkan kata kunci/kategori, dan menerima beberapa saran ide topik yang bisa saya tambahkan satu per satu ke Bank Tema (bukan otomatis tersimpan semua).
+28. Sebagai pengguna, di halaman Outline saya bisa menekan tombol "Draft dengan AI" untuk mendapat draft poin bicara atau draft daftar pertanyaan narasumber berdasarkan judul tema episode, yang muncul di area terpisah untuk saya edit/pindahkan manual ke outline asli.
+29. Sebagai pengguna, di halaman Pasca-Produksi saya bisa menekan tombol "Draft show notes dengan AI" yang menghasilkan draft show notes dari outline episode yang sudah ada, untuk saya edit sebelum disimpan sebagai draft final.
+30. Sebagai pengguna, saat pemanggilan AI gagal (mis. API key belum diisi, kuota habis, timeout), saya melihat pesan error yang jelas dan tetap bisa mengisi field terkait secara manual — fitur AI tidak boleh memblokir alur kerja normal.
+
 ### Status & Board (khusus Mode Tim)
 25. Sebagai producer, saya melihat board Kanban seluruh episode dikelompokkan berdasarkan tahap (Bank Tema → ... → Evaluasi), untuk tahu episode mana yang macet.
 26. Sebagai anggota tim, saya hanya melihat/mengubah tahap yang relevan dengan peran saya (mis. editor tidak perlu mengedit outline), tapi tetap bisa melihat semua data episode secara read-only.
@@ -94,11 +107,18 @@ Aplikasi **tidak** menggantikan tools yang sudah baik di tugasnya (Google Docs u
 
 **Auth:** NextAuth dengan credentials provider (email+password), session disimpan di database yang sama (Postgres)
 
+**Bantuan AI (Gemini API):**
+- Dipanggil lewat satu API route server-side (mis. `/api/ai/*`) yang menyimpan `GEMINI_API_KEY` di `.env` — tidak pernah dipanggil langsung dari client, dan key tidak pernah dikirim ke browser
+- Tiga endpoint tipis dengan prompt berbeda: generate ide tema, draft outline/pertanyaan narasumber, draft show notes — masing-masing menerima input singkat (kata kunci/judul/outline existing) dan mengembalikan teks draft
+- UI menampilkan hasil AI di area terpisah/preview, pengguna yang memilih menyalin/menyimpan ke field asli — tidak ada auto-save hasil AI
+- Dipicu manual (klik tombol), tidak ada pemanggilan otomatis/terjadwal, untuk menghindari biaya API yang tidak terkontrol
+- `.env.example` disediakan sebagai template kosong; `.env` asli ditambahkan ke `.gitignore`
+
 **MoSCoW (prioritas implementasi dalam satu rilis, bukan pembagian versi):**
 - **Must:** Auth, toggle Solo/Tim, Bank Tema, Riset & Outline, Panduan Eksekusi (timer + rundown + full-screen), Pra-Produksi (checklist + jadwal)
 - **Should:** Pasca-Produksi (checklist + timestamp), Publish & Distribusi, Board Kanban mode Tim
-- **Could:** Evaluasi, briefing/kontak tamu terstruktur (bisa jadi textarea bebas dulu)
-- **Won't (rilis ini):** integrasi API pihak ketiga apa pun (Google Docs, Canva, platform publish), notifikasi/reminder otomatis
+- **Could:** Evaluasi, briefing/kontak tamu terstruktur (bisa jadi textarea bebas dulu), bantuan AI (Gemini) di Bank Tema/Outline/Pasca-Produksi
+- **Won't (rilis ini):** integrasi API pihak ketiga lain (Google Docs, Canva, platform publish), notifikasi/reminder otomatis, bantuan AI otomatis/background (selalu manual-trigger)
 
 **NFR:**
 - Aplikasi harus tetap responsif dipakai di tablet (mode eksekusi jadi prioritas UX tertinggi)
@@ -106,6 +126,7 @@ Aplikasi **tidak** menggantikan tools yang sudah baik di tugasnya (Google Docs u
 - Akses privat via Tailscale sebagai default; struktur harus memungkinkan expose subdomain publik via Caddy di kemudian hari tanpa perubahan arsitektur besar
 - Database Postgres terpisah dari database n8n yang sudah berjalan di server yang sama (tidak berbagi skema/instance logis)
 - Timer di mode eksekusi tidak boleh nge-lag atau melompat saat tab browser idle di background (perlu dites khusus, timer berbasis timestamp bukan hanya `setInterval` counter naif)
+- Kredensial API Gemini disimpan di `.env` lokal server, tidak pernah di-hardcode di kode atau ter-commit ke repo
 
 ## Testing Decisions
 
@@ -115,10 +136,13 @@ Aplikasi **tidak** menggantikan tools yang sudah baik di tugasnya (Google Docs u
   - Toggle Solo/Tim: test bahwa perubahan mode tidak menghapus/merusak data episode yang sudah ada
   - Role-based visibility mode Tim: test bahwa peran tertentu tidak bisa mengubah data di luar tahap yang relevan
 - Tidak perlu end-to-end browser test penuh untuk MVP; cukup unit/integration test di level API route + component test untuk komponen Mode Eksekusi (timer, rundown navigation)
+- Endpoint bantuan AI: test dengan Gemini API di-mock (tidak memanggil API sungguhan di test suite) — verifikasi request yang dikirim ke API route terbentuk benar, response sukses diteruskan ke UI, dan response gagal ditangani sesuai user story 30 (pesan error jelas, tidak memblokir alur manual)
 
 ## Out of Scope
 
 - Integrasi API dengan Google Docs, Canva, atau software editing audio/video — hanya field link manual
+- Chatbot/asisten AI percakapan bebas — bantuan AI dibatasi ke tiga endpoint tipis dan spesifik tugas (ide tema, draft outline/pertanyaan, draft show notes)
+- Penyimpanan riwayat percakapan AI atau personalisasi model dari data historis pengguna
 - Aplikasi mobile native (Flutter/React Native) — web app responsif dianggap cukup untuk laptop/tablet di studio
 - Multi-tenant/multi-organisasi (mis. menjual ke pesantren/organisasi lain sebagai SaaS) — ini aplikasi internal untuk satu workspace
 - Analytics/growth tooling (GA4, metrik pertumbuhan) — tidak relevan untuk aplikasi internal
@@ -127,5 +151,5 @@ Aplikasi **tidak** menggantikan tools yang sudah baik di tugasnya (Google Docs u
 
 ## Further Notes
 
-- Kandidat fitur v2 (belum disepakati, tidak dikerjakan sekarang): reminder jadwal rekaman, generate draft outline dengan bantuan AI dari judul tema, integrasi API publish otomatis
+- Kandidat fitur v2 (belum disepakati, tidak dikerjakan sekarang): reminder jadwal rekaman, integrasi API publish otomatis, memperluas bantuan AI ke titik lain (mis. saran judul/deskripsi publish) kalau tiga titik awal terbukti berguna
 - Precedent internal yang relevan: pola "internal tool tervalidasi lalu digeneralisasi" pernah dicatat di riset workflow vibe coding sebelumnya (lihat `vibe-coding-workflow-dan-peluang-produk.md`, bagian 6.6) — bisa jadi arah lanjutan kalau suatu saat aplikasi ini ingin ditawarkan ke organisasi lain, tapi itu keputusan terpisah yang belum diambil.
