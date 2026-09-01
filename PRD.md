@@ -42,49 +42,49 @@ Hasil AI selalu berupa draft yang harus ditinjau/diedit manual sebelum disimpan 
 3. Sebagai admin/pemilik workspace mode Tim, saya bisa mengundang anggota lain dan memberi peran (Producer, Host, Editor) per episode.
 
 ### 1. Bank Tema
-4. Sebagai pengguna, saya bisa menambah ide topik baru dengan judul, deskripsi singkat, dan tag/kategori.
-5. Sebagai pengguna, saya bisa memfilter/mencari ide topik berdasarkan tag.
-6. Sebagai pengguna, saya bisa mengubah status ide topik (mis. "ide mentah" → "dipilih untuk episode") dan mengaitkannya ke satu episode.
+1. Sebagai pengguna, saya bisa menambah ide topik baru dengan judul, deskripsi singkat, dan tag/kategori.
+2. Sebagai pengguna, saya bisa memfilter/mencari ide topik berdasarkan tag.
+3. Sebagai pengguna, saya bisa mengubah status ide topik (mis. "ide mentah" → "dipilih untuk episode") dan mengaitkannya ke satu episode.
 
 ### 2. Riset & Outline
-7. Sebagai pengguna, saya bisa membuat outline untuk satu episode berisi daftar poin bicara terstruktur (urutan bisa diubah/drag).
-8. Sebagai pengguna, saya bisa menambahkan link referensi eksternal (mis. link Google Docs berisi riset panjang) ke outline.
-9. Sebagai pengguna, saya bisa menyusun daftar pertanyaan untuk narasumber, terpisah dari poin bicara host.
+1. Sebagai pengguna, saya bisa membuat outline untuk satu episode berisi daftar poin bicara terstruktur (urutan bisa diubah/drag).
+2. Sebagai pengguna, saya bisa menambahkan link referensi eksternal (mis. link Google Docs berisi riset panjang) ke outline.
+3. Sebagai pengguna, saya bisa menyusun daftar pertanyaan untuk narasumber, terpisah dari poin bicara host.
 
 ### 3. Pra-Produksi
-10. Sebagai pengguna, saya bisa membuat checklist alat/persiapan teknis per episode (mis. mic, rekaman cadangan) dan mencentangnya satu per satu.
-11. Sebagai pengguna, saya bisa mencatat jadwal rekaman (tanggal & jam) untuk satu episode.
-12. Sebagai pengguna, saya bisa mencatat kontak & catatan briefing untuk tamu/narasumber yang diundang.
+1. Sebagai pengguna, saya bisa membuat checklist alat/persiapan teknis per episode (mis. mic, rekaman cadangan) dan mencentangnya satu per satu.
+2. Sebagai pengguna, saya bisa mencatat jadwal rekaman (tanggal & jam) untuk satu episode.
+3. Sebagai pengguna, saya bisa mencatat kontak & catatan briefing untuk tamu/narasumber yang diundang.
 
 ### 4. Panduan Eksekusi (fitur inti)
-13. Sebagai host, saya bisa membuka satu episode dalam **mode eksekusi full-screen** yang menyembunyikan navigasi aplikasi dan hanya menampilkan rundown.
-14. Sebagai host, saya melihat rundown sebagai daftar segmen berurutan, masing-masing dengan talking points dan estimasi durasi.
-15. Sebagai host, saya bisa menjalankan timer yang berjalan otomatis dan menampilkan sisa/lewat waktu per segmen, serta bisa berpindah ke segmen berikutnya secara manual (bukan otomatis berdasarkan timer habis).
-16. Sebagai host, teks pada mode eksekusi cukup besar untuk dibaca sekilas dari jarak wajar (laptop/tablet di meja studio), dengan kontras tinggi.
-17. Sebagai host, saya bisa menandai catatan singkat di tengah sesi (mis. "perlu take ulang di segmen 3") tanpa keluar dari mode full-screen.
+1. Sebagai host, saya bisa membuka satu episode dalam **mode eksekusi full-screen** yang menyembunyikan navigasi aplikasi dan hanya menampilkan rundown.
+2. Sebagai host, saya melihat rundown sebagai daftar segmen berurutan, masing-masing dengan talking points dan estimasi durasi.
+3. Sebagai host, saya bisa menjalankan timer yang berjalan otomatis dan menampilkan sisa/lewat waktu per segmen, serta bisa berpindah ke segmen berikutnya secara manual (bukan otomatis berdasarkan timer habis).
+4. Sebagai host, teks pada mode eksekusi cukup besar untuk dibaca sekilas dari jarak wajar (laptop/tablet di meja studio), dengan kontras tinggi.
+5. Sebagai host, saya bisa menandai catatan singkat di tengah sesi (mis. "perlu take ulang di segmen 3") tanpa keluar dari mode full-screen.
 
 ### 5. Pasca-Produksi
-18. Sebagai editor, saya bisa mencatat timestamp/chapter marker untuk episode yang sudah direkam.
-19. Sebagai editor, saya bisa mencentang checklist tahap editing (mis. noise removal, mixing, final export).
-20. Sebagai pengguna, saya bisa menulis draft show notes berbasis outline yang sudah ada (bisa disalin dari poin bicara), lalu menambahkan link ke dokumen show notes final di luar app kalau ditulis lebih lengkap di Google Docs.
+1. Sebagai editor, saya bisa mencatat timestamp/chapter marker untuk episode yang sudah direkam.
+2. Sebagai editor, saya bisa mencentang checklist tahap editing (mis. noise removal, mixing, final export).
+3. Sebagai pengguna, saya bisa menulis draft show notes berbasis outline yang sudah ada (bisa disalin dari poin bicara), lalu menambahkan link ke dokumen show notes final di luar app kalau ditulis lebih lengkap di Google Docs.
 
 ### 6. Publish & Distribusi
-21. Sebagai pengguna, saya bisa mengisi metadata publish (judul final, deskripsi, tag) untuk satu episode.
-22. Sebagai pengguna, saya bisa mencentang checklist platform tujuan (mis. Spotify, YouTube, RSS) yang sudah dipublish untuk episode tersebut.
+1. Sebagai pengguna, saya bisa mengisi metadata publish (judul final, deskripsi, tag) untuk satu episode.
+2. Sebagai pengguna, saya bisa mencentang checklist platform tujuan (mis. Spotify, YouTube, RSS) yang sudah dipublish untuk episode tersebut.
 
 ### 7. Evaluasi (opsional)
-23. Sebagai pengguna, saya bisa menulis catatan evaluasi bebas untuk satu episode setelah publish (apa yang berjalan baik/kurang).
-24. Sebagai pengguna, saya bisa mencatat ide follow-up yang otomatis bisa diangkat jadi ide baru di Bank Tema.
+1. Sebagai pengguna, saya bisa menulis catatan evaluasi bebas untuk satu episode setelah publish (apa yang berjalan baik/kurang).
+2. Sebagai pengguna, saya bisa mencatat ide follow-up yang otomatis bisa diangkat jadi ide baru di Bank Tema.
 
 ### Bantuan AI (Gemini API)
-27. Sebagai pengguna, di halaman Bank Tema saya bisa menekan tombol "Minta ide AI", memasukkan kata kunci/kategori, dan menerima beberapa saran ide topik yang bisa saya tambahkan satu per satu ke Bank Tema (bukan otomatis tersimpan semua).
-28. Sebagai pengguna, di halaman Outline saya bisa menekan tombol "Draft dengan AI" untuk mendapat draft poin bicara atau draft daftar pertanyaan narasumber berdasarkan judul tema episode, yang muncul di area terpisah untuk saya edit/pindahkan manual ke outline asli.
-29. Sebagai pengguna, di halaman Pasca-Produksi saya bisa menekan tombol "Draft show notes dengan AI" yang menghasilkan draft show notes dari outline episode yang sudah ada, untuk saya edit sebelum disimpan sebagai draft final.
-30. Sebagai pengguna, saat pemanggilan AI gagal (mis. API key belum diisi, kuota habis, timeout), saya melihat pesan error yang jelas dan tetap bisa mengisi field terkait secara manual — fitur AI tidak boleh memblokir alur kerja normal.
+1. Sebagai pengguna, di halaman Bank Tema saya bisa menekan tombol "Minta ide AI", memasukkan kata kunci/kategori, dan menerima beberapa saran ide topik yang bisa saya tambahkan satu per satu ke Bank Tema (bukan otomatis tersimpan semua).
+2. Sebagai pengguna, di halaman Outline saya bisa menekan tombol "Draft dengan AI" untuk mendapat draft poin bicara atau draft daftar pertanyaan narasumber berdasarkan judul tema episode, yang muncul di area terpisah untuk saya edit/pindahkan manual ke outline asli.
+3. Sebagai pengguna, di halaman Pasca-Produksi saya bisa menekan tombol "Draft show notes dengan AI" yang menghasilkan draft show notes dari outline episode yang sudah ada, untuk saya edit sebelum disimpan sebagai draft final.
+4. Sebagai pengguna, saat pemanggilan AI gagal (mis. API key belum diisi, kuota habis, timeout), saya melihat pesan error yang jelas dan tetap bisa mengisi field terkait secara manual — fitur AI tidak boleh memblokir alur kerja normal.
 
 ### Status & Board (khusus Mode Tim)
-25. Sebagai producer, saya melihat board Kanban seluruh episode dikelompokkan berdasarkan tahap (Bank Tema → ... → Evaluasi), untuk tahu episode mana yang macet.
-26. Sebagai anggota tim, saya hanya melihat/mengubah tahap yang relevan dengan peran saya (mis. editor tidak perlu mengedit outline), tapi tetap bisa melihat semua data episode secara read-only.
+1. Sebagai producer, saya melihat board Kanban seluruh episode dikelompokkan berdasarkan tahap (Bank Tema → ... → Evaluasi), untuk tahu episode mana yang macet.
+2. Sebagai anggota tim, saya hanya melihat/mengubah tahap yang relevan dengan peran saya (mis. editor tidak perlu mengedit outline), tapi tetap bisa melihat semua data episode secara read-only.
 
 ## Implementation Decisions
 
