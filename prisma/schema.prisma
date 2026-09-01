@@ -27,11 +27,38 @@ model User {
   createdAt    DateTime @default(now())
 }
 
+enum ThemeIdeaStatus {
+  RAW
+  SELECTED
+}
+
 model ThemeIdea {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   title       String
   description String?
-  tags        String[] @default([])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  tags        String[]        @default([])
+  status      ThemeIdeaStatus @default(RAW)
+  episodeId   String?         @unique
+  episode     Episode?        @relation(fields: [episodeId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+enum EpisodeStage {
+  BANK_TEMA
+  RISET_OUTLINE
+  PRA_PRODUKSI
+  PANDUAN_EKSEKUSI
+  PASCA_PRODUKSI
+  PUBLISH_DISTRIBUSI
+  EVALUASI
+}
+
+model Episode {
+  id        String       @id @default(cuid())
+  title     String
+  stage     EpisodeStage @default(BANK_TEMA)
+  themeIdea ThemeIdea?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { deleteThemeIdeaAction } from "./actions";
+import { convertThemeIdeaToEpisodeAction } from "../episodes/actions";
 
 export default async function BankTemaPage({
   searchParams,
@@ -50,6 +51,15 @@ export default async function BankTemaPage({
             <form action={deleteThemeIdeaAction.bind(null, idea.id)} style={{ display: "inline" }}>
               <button type="submit">Hapus</button>
             </form>
+            {idea.episodeId ? (
+              <p>
+                <Link href={`/episodes/${idea.episodeId}`}>Lihat episode →</Link>
+              </p>
+            ) : (
+              <form action={convertThemeIdeaToEpisodeAction.bind(null, idea.id)}>
+                <button type="submit">Jadikan Episode</button>
+              </form>
+            )}
           </li>
         ))}
         {ideas.length === 0 && <p>Belum ada ide{activeTag ? ` dengan tag "${activeTag}"` : ""}.</p>}
