@@ -55,10 +55,28 @@ enum EpisodeStage {
 }
 
 model Episode {
-  id        String       @id @default(cuid())
-  title     String
-  stage     EpisodeStage @default(BANK_TEMA)
-  themeIdea ThemeIdea?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id              String           @id @default(cuid())
+  title           String
+  stage           EpisodeStage     @default(BANK_TEMA)
+  themeIdea       ThemeIdea?
+  rundownSegments RundownSegment[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+// Distinct from OutlineItem: OutlineItem is research/prep material,
+// RundownSegment is what actually renders in the full-screen execution
+// view (issue #10/#11) — per PRD.md Implementation Decisions, these are
+// deliberately separate models even though both are "ordered content
+// per episode".
+model RundownSegment {
+  id               String   @id @default(cuid())
+  episodeId        String
+  episode          Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  title            String
+  talkingPoints    String
+  estimatedMinutes Int      @default(5)
+  order            Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
