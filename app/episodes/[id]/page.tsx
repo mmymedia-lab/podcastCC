@@ -1,8 +1,17 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { STAGE_LABELS, STAGE_ORDER } from "../stages";
-import { updateEpisodeStageAction } from "../actions";
+import { updateEpisodeStageAction, updateRecordingScheduleAction } from "../actions";
+
+function toDatetimeLocalValue(date: Date | null): string {
+  if (!date) return "";
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
+    date.getHours(),
+  )}:${pad(date.getMinutes())}`;
+}
 
 export default async function EpisodeDetailPage({
   params,
@@ -43,8 +52,25 @@ export default async function EpisodeDetailPage({
           </li>
         ))}
       </ol>
+
+      <h2>Jadwal Rekaman</h2>
+      <form action={updateRecordingScheduleAction.bind(null, episode.id)}>
+        <label htmlFor="recordingScheduledAt">Tanggal & jam rekaman</label>
+        <input
+          id="recordingScheduledAt"
+          name="recordingScheduledAt"
+          type="datetime-local"
+          defaultValue={toDatetimeLocalValue(episode.recordingScheduledAt)}
+        />
+        <button type="submit">Simpan</button>
+      </form>
+
+      <h2>Detail Tahap</h2>
       <p>
-        <em>Detail per tahap (outline, checklist, rundown, dll.) ditambahkan di issue-issue berikutnya.</em>
+        <Link href={`/episodes/${episode.id}/guests`}>Tamu & Narasumber →</Link>
+      </p>
+      <p>
+        <em>Outline, checklist, dan tahap lain ditambahkan di issue-issue berikutnya.</em>
       </p>
     </main>
   );
