@@ -39,3 +39,12 @@ model WorkspaceSettings {
   mode      WorkspaceMode @default(SOLO)
   updatedAt DateTime      @updatedAt
 }
+
+model ThemeIdea {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  tags        String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

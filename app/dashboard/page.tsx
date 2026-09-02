@@ -10,6 +10,9 @@ export default async function DashboardPage() {
       <h1>Dashboard</h1>
       <p>Masuk sebagai {session.user?.email}</p>
       <p>
+        <Link href="/bank-tema">Bank Tema</Link>
+      </p>
+      <p>
         <Link href="/settings">Pengaturan Workspace</Link>
       </p>
       <LogoutButton />
