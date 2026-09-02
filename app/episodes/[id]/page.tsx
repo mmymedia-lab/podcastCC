@@ -79,6 +79,9 @@ export default async function EpisodeDetailPage({
         <Link href={`/episodes/${episode.id}/guests`}>Tamu & Narasumber →</Link>
       </p>
       <p>
+        <Link href={`/episodes/${episode.id}/show-notes`}>Show Notes →</Link>
+      </p>
+      <p>
         <Link href={`/episodes/${episode.id}/rundown`}>Rundown & Mode Eksekusi →</Link>
       </p>
       <p>
