@@ -20,11 +20,12 @@ model HealthCheck {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String        @id @default(cuid())
+  email        String        @unique
   passwordHash String
   name         String?
-  createdAt    DateTime @default(now())
+  episodeRoles EpisodeRole[]
+  createdAt    DateTime      @default(now())
 }
 
 enum ThemeIdeaStatus {
@@ -55,10 +56,44 @@ enum EpisodeStage {
 }
 
 model Episode {
-  id        String       @id @default(cuid())
+  id        String        @id @default(cuid())
   title     String
-  stage     EpisodeStage @default(BANK_TEMA)
+  stage     EpisodeStage  @default(BANK_TEMA)
   themeIdea ThemeIdea?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  roles     EpisodeRole[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+enum WorkspaceMode {
+  SOLO
+  TIM
+}
+
+// Singleton row (id is always 1) — this app has exactly one workspace,
+// not multiple tenants, per PRD.md Out of Scope.
+model WorkspaceSettings {
+  id        Int           @id @default(1)
+  mode      WorkspaceMode @default(SOLO)
+  updatedAt DateTime      @updatedAt
+}
+
+enum EpisodeRoleType {
+  PRODUCER
+  HOST
+  EDITOR
+}
+
+// Only meaningful in Tim mode (see WorkspaceSettings). A user can hold more
+// than one role on the same episode (e.g. Producer AND Host).
+model EpisodeRole {
+  id        String          @id @default(cuid())
+  episodeId String
+  episode   Episode         @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      EpisodeRoleType
+  createdAt DateTime        @default(now())
+
+  @@unique([episodeId, userId, role])
 }

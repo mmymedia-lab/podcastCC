@@ -15,6 +15,9 @@ export default async function DashboardPage() {
       <p>
         <Link href="/episodes">Episode</Link>
       </p>
+      <p>
+        <Link href="/settings">Pengaturan Workspace</Link>
+      </p>
       <LogoutButton />
     </main>
   );
