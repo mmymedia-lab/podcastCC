@@ -60,3 +60,10 @@ export async function deleteThemeIdeaAction(id: string) {
   await prisma.themeIdea.delete({ where: { id } });
   revalidatePath("/bank-tema");
 }
+
+/** Adds one AI-suggested idea straight to Bank Tema, title only. */
+export async function createThemeIdeaFromTitleAction(title: string) {
+  await requireSession();
+  await prisma.themeIdea.create({ data: { title } });
+  revalidatePath("/bank-tema");
+}

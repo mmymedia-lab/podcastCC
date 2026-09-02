@@ -1,0 +1,47 @@
+const DEFAULT_MODEL = "gemini-2.0-flash";
+
+export class GeminiConfigError extends Error {}
+export class GeminiRequestError extends Error {}
+
+/**
+ * Thin wrapper over the Gemini REST API. Never called from the client —
+ * the API key stays server-side (see PRD.md: credentials in .env, never
+ * hardcoded, never sent to the browser).
+ */
+export async function generateWithGemini(prompt: string): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new GeminiConfigError("GEMINI_API_KEY belum diisi di .env.");
+  }
+
+  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+      }),
+    });
+  } catch {
+    throw new GeminiRequestError("Tidak bisa menghubungi Gemini API (masalah koneksi).");
+  }
+
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new GeminiRequestError("Kuota Gemini API habis, coba lagi nanti.");
+    }
+    throw new GeminiRequestError(`Gemini API mengembalikan error (${response.status}).`);
+  }
+
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (typeof text !== "string" || !text.trim()) {
+    throw new GeminiRequestError("Gemini API tidak mengembalikan hasil yang bisa dipakai.");
+  }
+
+  return text.trim();
+}

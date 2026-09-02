@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { createOutlineItemAction, deleteOutlineItemAction, moveOutlineItemAction } from "./actions";
+import { AiOutlineAssist } from "./ai-outline-assist";
 
 export default async function OutlinePage({
   params,
@@ -26,6 +27,8 @@ export default async function OutlinePage({
         <Link href={`/episodes/${episodeId}`}>← {episode.title}</Link>
       </p>
       <h1>Outline: {episode.title}</h1>
+
+      <AiOutlineAssist episodeTitle={episode.title} />
 
       <ol>
         {items.map((item, index) => (

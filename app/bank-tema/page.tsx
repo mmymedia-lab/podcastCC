@@ -3,6 +3,7 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { deleteThemeIdeaAction } from "./actions";
 import { convertThemeIdeaToEpisodeAction } from "../episodes/actions";
+import { AiThemeIdeaAssist } from "./ai-theme-idea-assist";
 
 export default async function BankTemaPage({
   searchParams,
@@ -28,6 +29,8 @@ export default async function BankTemaPage({
       <p>
         <Link href="/bank-tema/new">+ Tambah ide baru</Link>
       </p>
+
+      <AiThemeIdeaAssist />
 
       {uniqueTags.length > 0 && (
         <nav aria-label="Filter tag">
