@@ -26,3 +26,16 @@ model User {
   name         String?
   createdAt    DateTime @default(now())
 }
+
+enum WorkspaceMode {
+  SOLO
+  TIM
+}
+
+// Singleton row (id is always 1) — this app has exactly one workspace,
+// not multiple tenants, per PRD.md Out of Scope.
+model WorkspaceSettings {
+  id        Int           @id @default(1)
+  mode      WorkspaceMode @default(SOLO)
+  updatedAt DateTime      @updatedAt
+}
