@@ -78,6 +78,7 @@ model Episode {
   checklistItems       ChecklistItem[]
   guests               Guest[]
   rundownSegments      RundownSegment[]
+  timestampMarkers     TimestampMarker[]
   createdAt            DateTime         @default(now())
   updatedAt            DateTime         @updatedAt
 }
@@ -99,6 +100,16 @@ model GuestQuestion {
   episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
   content   String
   order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TimestampMarker {
+  id        String   @id @default(cuid())
+  episodeId String
+  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  label     String
+  timeLabel String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

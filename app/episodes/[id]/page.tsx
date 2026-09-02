@@ -82,7 +82,13 @@ export default async function EpisodeDetailPage({
         <Link href={`/episodes/${episode.id}/rundown`}>Rundown & Mode Eksekusi →</Link>
       </p>
       <p>
-        <em>Checklist pasca-produksi, publish, dan evaluasi ditambahkan di issue-issue berikutnya.</em>
+        <Link href={`/episodes/${episode.id}/checklist/pasca-produksi`}>Checklist Pasca-Produksi →</Link>
+      </p>
+      <p>
+        <Link href={`/episodes/${episode.id}/timestamps`}>Timestamp / Chapter →</Link>
+      </p>
+      <p>
+        <em>Publish dan evaluasi ditambahkan di issue-issue berikutnya.</em>
       </p>
     </main>
   );
