@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireContent(raw: FormDataEntryValue | null): string {
@@ -17,7 +17,7 @@ function optionalUrl(raw: FormDataEntryValue | null): string | null {
 }
 
 export async function createOutlineItemAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "RISET_OUTLINE");
 
   const last = await prisma.outlineItem.findFirst({
     where: { episodeId },
@@ -41,7 +41,7 @@ export async function updateOutlineItemAction(
   itemId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableStage(episodeId, "RISET_OUTLINE");
 
   await prisma.outlineItem.update({
     where: { id: itemId },
@@ -56,7 +56,7 @@ export async function updateOutlineItemAction(
 }
 
 export async function deleteOutlineItemAction(episodeId: string, itemId: string) {
-  await requireSession();
+  await requireEditableStage(episodeId, "RISET_OUTLINE");
   await prisma.outlineItem.delete({ where: { id: itemId } });
   revalidatePath(`/episodes/${episodeId}/outline`);
 }
@@ -66,7 +66,7 @@ export async function moveOutlineItemAction(
   itemId: string,
   direction: "up" | "down",
 ) {
-  await requireSession();
+  await requireEditableStage(episodeId, "RISET_OUTLINE");
 
   const items = await prisma.outlineItem.findMany({
     where: { episodeId },

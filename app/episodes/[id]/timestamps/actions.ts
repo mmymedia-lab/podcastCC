@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireLabel(raw: FormDataEntryValue | null): string {
@@ -20,7 +20,7 @@ function requireTimeLabel(raw: FormDataEntryValue | null): string {
 }
 
 export async function createTimestampMarkerAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PASCA_PRODUKSI");
 
   await prisma.timestampMarker.create({
     data: {
@@ -38,7 +38,7 @@ export async function updateTimestampMarkerAction(
   markerId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PASCA_PRODUKSI");
 
   await prisma.timestampMarker.update({
     where: { id: markerId },
@@ -53,7 +53,7 @@ export async function updateTimestampMarkerAction(
 }
 
 export async function deleteTimestampMarkerAction(episodeId: string, markerId: string) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PASCA_PRODUKSI");
   await prisma.timestampMarker.delete({ where: { id: markerId } });
   revalidatePath(`/episodes/${episodeId}/timestamps`);
 }

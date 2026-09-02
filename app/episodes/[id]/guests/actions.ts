@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireName(raw: FormDataEntryValue | null): string {
@@ -17,7 +17,7 @@ function optionalText(raw: FormDataEntryValue | null): string | null {
 }
 
 export async function createGuestAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PRA_PRODUKSI");
 
   await prisma.guest.create({
     data: {
@@ -32,7 +32,7 @@ export async function createGuestAction(episodeId: string, formData: FormData) {
 }
 
 export async function updateGuestAction(episodeId: string, guestId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PRA_PRODUKSI");
 
   await prisma.guest.update({
     where: { id: guestId },
@@ -48,7 +48,7 @@ export async function updateGuestAction(episodeId: string, guestId: string, form
 }
 
 export async function deleteGuestAction(episodeId: string, guestId: string) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PRA_PRODUKSI");
   await prisma.guest.delete({ where: { id: guestId } });
   revalidatePath(`/episodes/${episodeId}/guests`);
 }

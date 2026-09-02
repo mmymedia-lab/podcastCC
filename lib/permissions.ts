@@ -1,5 +1,6 @@
 import { EpisodeRoleType, EpisodeStage } from "@prisma/client";
 import { prisma } from "./prisma";
+import { requireSession } from "./session";
 
 // Which roles may edit each stage. This mapping is this project's own
 // decision (PRD.md flagged issue #16 as needing one — not fully specified
@@ -32,12 +33,6 @@ const STAGE_ROLE_ACCESS: Record<EpisodeStage, EpisodeRoleType[]> = {
  * against adversarial users. Once at least one role is configured on the
  * episode, only users holding an allowed role for that stage may edit.
  *
- * NOTE: this is not yet wired into the actions for Outline (#6), Guest
- * Questions (#7), Checklist (#8), Guests/Schedule (#9), Rundown/Execute
- * (#10/#11), Show Notes (#13), or Publish (#14) — those live on separate
- * branches from this one and wiring them in from here would mean editing
- * code that isn't part of this branch's history. That wiring is a
- * deliberate follow-up once those branches are merged into main.
  */
 export async function canEditStage(
   userId: string,
@@ -55,4 +50,29 @@ export async function canEditStage(
 
   const allowedRoles = STAGE_ROLE_ACCESS[stage];
   return userRoles.some((role) => allowedRoles.includes(role));
+}
+
+/**
+ * Server-action guard combining requireSession() with canEditStage().
+ * Redirects to /login if unauthenticated; throws a plain Error (consistent
+ * with this codebase's existing validation-error convention, e.g.
+ * "Judul wajib diisi.") if the logged-in user can't edit this stage.
+ *
+ * Not usable inside route handlers (requireSession() calls redirect(),
+ * which only works in Server Components/Actions) — the note API route
+ * checks canEditStage() directly instead.
+ */
+export async function requireEditableStage(episodeId: string, stage: EpisodeStage) {
+  const session = await requireSession();
+  const userId = session.user?.id;
+  if (!userId) {
+    throw new Error("Sesi tidak valid, silakan login ulang.");
+  }
+
+  const allowed = await canEditStage(userId, episodeId, stage);
+  if (!allowed) {
+    throw new Error("Kamu tidak punya izin mengedit tahap ini.");
+  }
+
+  return session;
 }
