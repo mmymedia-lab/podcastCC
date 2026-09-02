@@ -13,6 +13,9 @@ export default async function DashboardPage() {
         <Link href="/bank-tema">Bank Tema</Link>
       </p>
       <p>
+        <Link href="/episodes">Episode</Link>
+      </p>
+      <p>
         <Link href="/settings">Pengaturan Workspace</Link>
       </p>
       <LogoutButton />
