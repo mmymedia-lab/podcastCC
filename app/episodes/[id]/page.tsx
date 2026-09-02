@@ -49,6 +49,12 @@ export default async function EpisodeDetailPage({
         <Link href={`/episodes/${episode.id}/checklist/pra-produksi`}>Checklist Pra-Produksi →</Link>
       </p>
       <p>
+        <Link href={`/episodes/${episode.id}/checklist/pasca-produksi`}>Checklist Pasca-Produksi →</Link>
+      </p>
+      <p>
+        <Link href={`/episodes/${episode.id}/timestamps`}>Timestamp / Chapter →</Link>
+      </p>
+      <p>
         <em>Outline, pertanyaan narasumber, dan tahap lain ditambahkan di issue-issue berikutnya.</em>
       </p>
     </main>
