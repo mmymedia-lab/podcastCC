@@ -50,6 +50,9 @@ export default async function EpisodeDetailPage({
         <Link href={`/episodes/${episode.id}/outline`}>Riset & Outline →</Link>
       </p>
       <p>
+        <Link href={`/episodes/${episode.id}/show-notes`}>Show Notes →</Link>
+      </p>
+      <p>
         <em>Checklist, rundown, dan tahap lain ditambahkan di issue-issue berikutnya.</em>
       </p>
     </main>

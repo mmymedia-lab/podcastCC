@@ -55,13 +55,15 @@ enum EpisodeStage {
 }
 
 model Episode {
-  id           String        @id @default(cuid())
-  title        String
-  stage        EpisodeStage  @default(BANK_TEMA)
-  themeIdea    ThemeIdea?
-  outlineItems OutlineItem[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id                   String        @id @default(cuid())
+  title                String
+  stage                EpisodeStage  @default(BANK_TEMA)
+  themeIdea            ThemeIdea?
+  outlineItems         OutlineItem[]
+  showNotesDraft       String?
+  showNotesExternalUrl String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
 }
 
 model OutlineItem {
