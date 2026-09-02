@@ -22,8 +22,13 @@ services:
       - podcastcc
 
   migrate:
-    build: .
-    command: npx prisma migrate deploy
+    # Targets the "builder" stage, not the final lean "runner" image, because
+    # it needs the full node_modules (prisma CLI, tsx for the seed script) —
+    # the runner only ships the standalone Next.js server.
+    build:
+      context: .
+      target: builder
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed"
     depends_on:
       - db
     env_file:
