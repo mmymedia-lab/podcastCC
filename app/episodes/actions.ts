@@ -28,6 +28,20 @@ export async function convertThemeIdeaToEpisodeAction(themeIdeaId: string) {
   redirect(`/episodes/${episode.id}`);
 }
 
+export async function updateRecordingScheduleAction(episodeId: string, formData: FormData) {
+  await requireSession();
+
+  const raw = formData.get("recordingScheduledAt");
+  const recordingScheduledAt = typeof raw === "string" && raw ? new Date(raw) : null;
+
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: { recordingScheduledAt },
+  });
+
+  revalidatePath(`/episodes/${episodeId}`);
+}
+
 export async function updateEpisodeStageAction(episodeId: string, formData: FormData) {
   await requireSession();
 
