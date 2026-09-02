@@ -91,7 +91,10 @@ export default async function EpisodeDetailPage({
         <Link href={`/episodes/${episode.id}/timestamps`}>Timestamp / Chapter →</Link>
       </p>
       <p>
-        <em>Publish dan evaluasi ditambahkan di issue-issue berikutnya.</em>
+        <Link href={`/episodes/${episode.id}/publish`}>Publish & Distribusi →</Link>
+      </p>
+      <p>
+        <em>Evaluasi ditambahkan di issue-issue berikutnya.</em>
       </p>
     </main>
   );

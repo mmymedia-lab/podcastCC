@@ -81,6 +81,9 @@ model Episode {
   timestampMarkers     TimestampMarker[]
   showNotesDraft       String?
   showNotesExternalUrl String?
+  publishTitle         String?
+  publishDescription   String?
+  publishTags          String[]          @default([])
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
 }
