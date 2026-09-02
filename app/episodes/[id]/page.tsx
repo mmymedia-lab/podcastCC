@@ -94,7 +94,10 @@ export default async function EpisodeDetailPage({
         <Link href={`/episodes/${episode.id}/publish`}>Publish & Distribusi →</Link>
       </p>
       <p>
-        <em>Evaluasi ditambahkan di issue-issue berikutnya.</em>
+        <Link href={`/episodes/${episode.id}/evaluation`}>Evaluasi →</Link>
+      </p>
+      <p>
+        <em>Semua tahap PRD sudah tersedia di sini.</em>
       </p>
     </main>
   );
