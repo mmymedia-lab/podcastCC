@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
-import { ChecklistCategory } from "@prisma/client";
+import { ChecklistCategory, EpisodeStage } from "@prisma/client";
+import { slugToCategory } from "./categories";
 
 function requireLabel(raw: FormDataEntryValue | null): string {
   if (typeof raw !== "string" || !raw.trim()) {
@@ -12,13 +13,27 @@ function requireLabel(raw: FormDataEntryValue | null): string {
   return raw.trim();
 }
 
+const CATEGORY_STAGE: Record<ChecklistCategory, EpisodeStage> = {
+  PRE_PRODUCTION: "PRA_PRODUKSI",
+  POST_PRODUCTION: "PASCA_PRODUKSI",
+  PUBLISH: "PUBLISH_DISTRIBUSI",
+};
+
+async function requireEditableChecklistStage(episodeId: string, slug: string) {
+  const category = slugToCategory(slug);
+  if (!category) {
+    throw new Error("Kategori checklist tidak valid.");
+  }
+  await requireEditableStage(episodeId, CATEGORY_STAGE[category]);
+}
+
 export async function createChecklistItemAction(
   episodeId: string,
   category: ChecklistCategory,
   slug: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableStage(episodeId, CATEGORY_STAGE[category]);
 
   const last = await prisma.checklistItem.findFirst({
     where: { episodeId, category },
@@ -38,7 +53,7 @@ export async function createChecklistItemAction(
 }
 
 export async function toggleChecklistItemAction(episodeId: string, slug: string, itemId: string) {
-  await requireSession();
+  await requireEditableChecklistStage(episodeId, slug);
 
   const item = await prisma.checklistItem.findUnique({ where: { id: itemId } });
   if (!item) return;
@@ -52,7 +67,7 @@ export async function toggleChecklistItemAction(episodeId: string, slug: string,
 }
 
 export async function deleteChecklistItemAction(episodeId: string, slug: string, itemId: string) {
-  await requireSession();
+  await requireEditableChecklistStage(episodeId, slug);
   await prisma.checklistItem.delete({ where: { id: itemId } });
   revalidatePath(`/episodes/${episodeId}/checklist/${slug}`);
 }

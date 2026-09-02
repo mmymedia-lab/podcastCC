@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireContent(raw: FormDataEntryValue | null): string {
@@ -13,7 +13,7 @@ function requireContent(raw: FormDataEntryValue | null): string {
 }
 
 export async function createGuestQuestionAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "RISET_OUTLINE");
 
   const last = await prisma.guestQuestion.findFirst({
     where: { episodeId },
@@ -36,7 +36,7 @@ export async function updateGuestQuestionAction(
   itemId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableStage(episodeId, "RISET_OUTLINE");
 
   await prisma.guestQuestion.update({
     where: { id: itemId },
@@ -48,7 +48,7 @@ export async function updateGuestQuestionAction(
 }
 
 export async function deleteGuestQuestionAction(episodeId: string, itemId: string) {
-  await requireSession();
+  await requireEditableStage(episodeId, "RISET_OUTLINE");
   await prisma.guestQuestion.delete({ where: { id: itemId } });
   revalidatePath(`/episodes/${episodeId}/guest-questions`);
 }
@@ -58,7 +58,7 @@ export async function moveGuestQuestionAction(
   itemId: string,
   direction: "up" | "down",
 ) {
-  await requireSession();
+  await requireEditableStage(episodeId, "RISET_OUTLINE");
 
   const items = await prisma.guestQuestion.findMany({
     where: { episodeId },

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireContent(raw: FormDataEntryValue | null): string {
@@ -12,7 +12,7 @@ function requireContent(raw: FormDataEntryValue | null): string {
 }
 
 export async function createEvaluationNoteAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "EVALUASI");
 
   await prisma.evaluationNote.create({
     data: {
@@ -25,14 +25,14 @@ export async function createEvaluationNoteAction(episodeId: string, formData: Fo
 }
 
 export async function deleteEvaluationNoteAction(episodeId: string, noteId: string) {
-  await requireSession();
+  await requireEditableStage(episodeId, "EVALUASI");
   await prisma.evaluationNote.delete({ where: { id: noteId } });
   revalidatePath(`/episodes/${episodeId}/evaluation`);
 }
 
 /** Turns a follow-up note into a new Bank Tema idea, per PRD.md User Story 24. */
 export async function convertNoteToThemeIdeaAction(episodeId: string, noteId: string) {
-  await requireSession();
+  await requireEditableStage(episodeId, "EVALUASI");
 
   const note = await prisma.evaluationNote.findUnique({ where: { id: noteId } });
   if (!note) return;

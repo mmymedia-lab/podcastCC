@@ -10,9 +10,7 @@ type Segment = {
   sessionNote: string | null;
 };
 
-// Exported so it can be covered by a unit test once a test runner is set
-// up in this project (see PR notes — not yet configured, PRD.md Testing
-// Decisions calls this out as the slice most worth isolated coverage).
+// Exported so it can be covered by a unit test (see formatElapsed.test.ts).
 export function formatElapsed(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const minutes = Math.floor(totalSeconds / 60);
