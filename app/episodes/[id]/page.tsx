@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
@@ -43,8 +44,13 @@ export default async function EpisodeDetailPage({
           </li>
         ))}
       </ol>
+
+      <h2>Detail Tahap</h2>
       <p>
-        <em>Detail per tahap (outline, checklist, rundown, dll.) ditambahkan di issue-issue berikutnya.</em>
+        <Link href={`/episodes/${episode.id}/outline`}>Riset & Outline →</Link>
+      </p>
+      <p>
+        <em>Checklist, rundown, dan tahap lain ditambahkan di issue-issue berikutnya.</em>
       </p>
     </main>
   );
