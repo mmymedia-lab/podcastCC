@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { STAGE_LABELS, STAGE_ORDER } from "../stages";
 import { updateEpisodeStageAction, updateRecordingScheduleAction } from "../actions";
 
@@ -23,6 +24,8 @@ export default async function EpisodeDetailPage({
 
   const episode = await prisma.episode.findUnique({ where: { id } });
   if (!episode) notFound();
+
+  const settings = await getWorkspaceSettings();
 
   return (
     <main>
@@ -96,6 +99,11 @@ export default async function EpisodeDetailPage({
       <p>
         <Link href={`/episodes/${episode.id}/evaluation`}>Evaluasi →</Link>
       </p>
+      {settings.mode === "TIM" && (
+        <p>
+          <Link href={`/episodes/${episode.id}/roles`}>Peran Tim →</Link>
+        </p>
+      )}
       <p>
         <em>Semua tahap PRD sudah tersedia di sini.</em>
       </p>
