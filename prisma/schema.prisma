@@ -74,6 +74,7 @@ model Episode {
   themeIdea      ThemeIdea?
   outlineItems   OutlineItem[]
   guestQuestions GuestQuestion[]
+  checklistItems ChecklistItem[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
@@ -97,4 +98,25 @@ model GuestQuestion {
   order     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Shared by Pra-Produksi, Pasca-Produksi, and Publish & Distribusi checklists
+// (distinguished by `category`) per PRD.md Implementation Decisions — one
+// reusable model instead of three near-identical tables.
+enum ChecklistCategory {
+  PRE_PRODUCTION
+  POST_PRODUCTION
+  PUBLISH
+}
+
+model ChecklistItem {
+  id        String            @id @default(cuid())
+  episodeId String
+  episode   Episode           @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  category  ChecklistCategory
+  label     String
+  isDone    Boolean           @default(false)
+  order     Int
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 }

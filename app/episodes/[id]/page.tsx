@@ -53,7 +53,10 @@ export default async function EpisodeDetailPage({
         <Link href={`/episodes/${episode.id}/guest-questions`}>Pertanyaan Narasumber →</Link>
       </p>
       <p>
-        <em>Checklist, rundown, dan tahap lain ditambahkan di issue-issue berikutnya.</em>
+        <Link href={`/episodes/${episode.id}/checklist/pra-produksi`}>Checklist Pra-Produksi →</Link>
+      </p>
+      <p>
+        <em>Rundown dan tahap lain ditambahkan di issue-issue berikutnya.</em>
       </p>
     </main>
   );
