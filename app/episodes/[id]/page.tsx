@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { STAGE_LABELS, STAGE_ORDER } from "../stages";
 import { updateEpisodeStageAction } from "../actions";
 
@@ -14,6 +16,8 @@ export default async function EpisodeDetailPage({
 
   const episode = await prisma.episode.findUnique({ where: { id } });
   if (!episode) notFound();
+
+  const settings = await getWorkspaceSettings();
 
   return (
     <main>
@@ -43,8 +47,14 @@ export default async function EpisodeDetailPage({
           </li>
         ))}
       </ol>
+      <h2>Detail Tahap</h2>
+      {settings.mode === "TIM" && (
+        <p>
+          <Link href={`/episodes/${episode.id}/roles`}>Peran Tim →</Link>
+        </p>
+      )}
       <p>
-        <em>Detail per tahap (outline, checklist, rundown, dll.) ditambahkan di issue-issue berikutnya.</em>
+        <em>Outline, checklist, rundown, dan tahap lain ditambahkan di issue-issue berikutnya.</em>
       </p>
     </main>
   );
