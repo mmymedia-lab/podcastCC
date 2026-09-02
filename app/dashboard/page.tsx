@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { requireSession } from "@/lib/session";
+import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { LogoutButton } from "./logout-button";
 
 export default async function DashboardPage() {
   const session = await requireSession();
+  const settings = await getWorkspaceSettings();
 
   return (
     <main>
@@ -15,6 +17,11 @@ export default async function DashboardPage() {
       <p>
         <Link href="/episodes">Episode</Link>
       </p>
+      {settings.mode === "TIM" && (
+        <p>
+          <Link href="/board">Board</Link>
+        </p>
+      )}
       <p>
         <Link href="/settings">Pengaturan Workspace</Link>
       </p>
