@@ -148,6 +148,10 @@ model RundownSegment {
   talkingPoints    String
   estimatedMinutes Int      @default(5)
   order            Int
+  // Ad-hoc note jotted during a live execution session (e.g. "perlu take
+  // ulang di segmen 3") — distinct from talkingPoints, which is prep
+  // content authored beforehand.
+  sessionNote      String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
