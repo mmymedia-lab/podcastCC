@@ -1,3 +1,4 @@
 {$PODCASTCC_DOMAIN} {
+	tls {$PODCASTCC_TLS_MODE}
 	reverse_proxy app:3000
 }
