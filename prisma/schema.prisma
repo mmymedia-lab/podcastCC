@@ -55,13 +55,16 @@ enum EpisodeStage {
 }
 
 model Episode {
-  id             String          @id @default(cuid())
-  title          String
-  stage          EpisodeStage    @default(BANK_TEMA)
-  themeIdea      ThemeIdea?
-  checklistItems ChecklistItem[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id                 String          @id @default(cuid())
+  title              String
+  stage              EpisodeStage    @default(BANK_TEMA)
+  themeIdea          ThemeIdea?
+  checklistItems     ChecklistItem[]
+  publishTitle       String?
+  publishDescription String?
+  publishTags        String[]        @default([])
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 }
 
 // Shared by Pra-Produksi, Pasca-Produksi, and Publish & Distribusi checklists
