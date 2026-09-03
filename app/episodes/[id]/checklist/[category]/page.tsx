@@ -40,7 +40,16 @@ export default async function ChecklistPage({
               action={toggleChecklistItemAction.bind(null, episodeId, slug, item.id)}
               style={{ display: "inline" }}
             >
-              <button type="submit" aria-pressed={item.isDone}>
+              <button
+                type="submit"
+                aria-pressed={item.isDone}
+                aria-label={
+                  item.isDone
+                    ? `Tandai "${item.label}" belum selesai`
+                    : `Tandai "${item.label}" selesai`
+                }
+                style={{ minWidth: "2.5rem", minHeight: "2.5rem" }}
+              >
                 {item.isDone ? "☑" : "☐"}
               </button>
             </form>
