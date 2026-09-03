@@ -35,12 +35,16 @@ export default async function EvaluationPage({
         {notes.map((note) => (
           <li key={note.id}>
             <p style={{ whiteSpace: "pre-wrap" }}>{note.content}</p>
-            <form
-              action={convertNoteToThemeIdeaAction.bind(null, episodeId, note.id)}
-              style={{ display: "inline" }}
-            >
-              <button type="submit">Jadikan ide baru</button>
-            </form>{" "}
+            {note.convertedToThemeIdeaAt ? (
+              <span>✓ Sudah dijadikan ide</span>
+            ) : (
+              <form
+                action={convertNoteToThemeIdeaAction.bind(null, episodeId, note.id)}
+                style={{ display: "inline" }}
+              >
+                <button type="submit">Jadikan ide baru</button>
+              </form>
+            )}{" "}
             <form
               action={deleteEvaluationNoteAction.bind(null, episodeId, note.id)}
               style={{ display: "inline" }}
