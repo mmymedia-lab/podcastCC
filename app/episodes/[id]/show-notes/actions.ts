@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function optionalText(raw: FormDataEntryValue | null): string | null {
@@ -9,7 +9,7 @@ function optionalText(raw: FormDataEntryValue | null): string | null {
 }
 
 export async function updateShowNotesAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PASCA_PRODUKSI");
 
   await prisma.episode.update({
     where: { id: episodeId },

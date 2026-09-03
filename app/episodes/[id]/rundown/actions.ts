@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireTitle(raw: FormDataEntryValue | null): string {
@@ -25,7 +25,7 @@ function parseMinutes(raw: FormDataEntryValue | null): number {
 }
 
 export async function createRundownSegmentAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PANDUAN_EKSEKUSI");
 
   const last = await prisma.rundownSegment.findFirst({
     where: { episodeId },
@@ -50,7 +50,7 @@ export async function updateRundownSegmentAction(
   segmentId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PANDUAN_EKSEKUSI");
 
   await prisma.rundownSegment.update({
     where: { id: segmentId },
@@ -66,7 +66,7 @@ export async function updateRundownSegmentAction(
 }
 
 export async function deleteRundownSegmentAction(episodeId: string, segmentId: string) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PANDUAN_EKSEKUSI");
   await prisma.rundownSegment.delete({ where: { id: segmentId } });
   revalidatePath(`/episodes/${episodeId}/rundown`);
 }
@@ -76,7 +76,7 @@ export async function moveRundownSegmentAction(
   segmentId: string,
   direction: "up" | "down",
 ) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PANDUAN_EKSEKUSI");
 
   const segments = await prisma.rundownSegment.findMany({
     where: { episodeId },

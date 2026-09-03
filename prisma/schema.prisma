@@ -123,12 +123,13 @@ model TimestampMarker {
 }
 
 model EvaluationNote {
-  id        String   @id @default(cuid())
-  episodeId String
-  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                     String    @id @default(cuid())
+  episodeId              String
+  episode                Episode   @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  content                String
+  convertedToThemeIdeaAt DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 }
 
 // Shared by Pra-Produksi, Pasca-Produksi, and Publish & Distribusi checklists

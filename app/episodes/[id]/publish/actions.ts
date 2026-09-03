@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function optionalText(raw: FormDataEntryValue | null): string | null {
@@ -17,7 +17,7 @@ function parseTags(raw: FormDataEntryValue | null): string[] {
 }
 
 export async function updatePublishMetadataAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PUBLISH_DISTRIBUSI");
 
   await prisma.episode.update({
     where: { id: episodeId },

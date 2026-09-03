@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
+import { requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { EpisodeStage } from "@prisma/client";
 import { STAGE_ORDER } from "./stages";
@@ -29,7 +30,7 @@ export async function convertThemeIdeaToEpisodeAction(themeIdeaId: string) {
 }
 
 export async function updateRecordingScheduleAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableStage(episodeId, "PRA_PRODUKSI");
 
   const raw = formData.get("recordingScheduledAt");
   const recordingScheduledAt = typeof raw === "string" && raw ? new Date(raw) : null;
@@ -43,7 +44,12 @@ export async function updateRecordingScheduleAction(episodeId: string, formData:
 }
 
 export async function updateEpisodeStageAction(episodeId: string, formData: FormData) {
-  await requireSession();
+  const episode = await prisma.episode.findUnique({ where: { id: episodeId } });
+  if (!episode) throw new Error("Episode tidak ditemukan.");
+
+  // Gate on the CURRENT stage: moving the pipeline marker forward is itself
+  // an edit of whatever stage the episode is presently in.
+  await requireEditableStage(episodeId, episode.stage);
 
   const stage = formData.get("stage");
   if (typeof stage !== "string" || !STAGE_ORDER.includes(stage as EpisodeStage)) {
