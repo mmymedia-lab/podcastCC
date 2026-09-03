@@ -2,6 +2,15 @@
 
 import { useState } from "react";
 import { updateShowNotesAction } from "./actions";
+import {
+  BUTTON_PRIMARY,
+  BUTTON_SECONDARY,
+  FIELD_GROUP,
+  FORM,
+  INPUT,
+  LABEL,
+  TEXTAREA,
+} from "@/lib/ui-classes";
 
 export function ShowNotesForm({
   episodeId,
@@ -42,35 +51,60 @@ export function ShowNotesForm({
   }
 
   return (
-    <form action={updateShowNotesAction.bind(null, episodeId)}>
-      <div>
-        <label htmlFor="draft">Draft show notes</label>
-        <br />
-        <button type="button" onClick={() => setDraft(outlineText)} disabled={!outlineText}>
-          Isi dari Outline
-        </button>{" "}
-        <button type="button" onClick={requestAiDraft} disabled={aiStatus === "loading"}>
-          {aiStatus === "loading" ? "Membuat draft..." : "Draft dengan AI"}
-        </button>
-        {aiStatus === "error" && (
-          <p role="alert">{aiError} — kamu tetap bisa isi/edit draft manual di bawah.</p>
-        )}
-        <br />
+    <form action={updateShowNotesAction.bind(null, episodeId)} className={FORM}>
+      <div className={FIELD_GROUP}>
+        <label htmlFor="draft" className={LABEL}>
+          Draft show notes
+        </label>
+        <div className="mb-2 rounded-lg border border-primary-100 bg-primary-50 p-3">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setDraft(outlineText)}
+              disabled={!outlineText}
+              className={BUTTON_SECONDARY}
+            >
+              Isi dari Outline
+            </button>
+            <button
+              type="button"
+              onClick={requestAiDraft}
+              disabled={aiStatus === "loading"}
+              className={BUTTON_PRIMARY}
+            >
+              {aiStatus === "loading" ? "Membuat draft..." : "Draft dengan AI"}
+            </button>
+          </div>
+          {aiStatus === "error" && (
+            <p role="alert" className="mt-2 text-sm text-danger-700">
+              {aiError} — kamu tetap bisa isi/edit draft manual di bawah.
+            </p>
+          )}
+        </div>
         <textarea
           id="draft"
           name="draft"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           rows={10}
-          style={{ width: "100%", maxWidth: "40rem" }}
+          className={TEXTAREA}
         />
       </div>
-      <div>
-        <label htmlFor="externalUrl">Link show notes final (opsional, mis. Google Docs)</label>
-        <br />
-        <input id="externalUrl" name="externalUrl" type="url" defaultValue={initialExternalUrl} />
+      <div className={FIELD_GROUP}>
+        <label htmlFor="externalUrl" className={LABEL}>
+          Link show notes final (opsional, mis. Google Docs)
+        </label>
+        <input
+          id="externalUrl"
+          name="externalUrl"
+          type="url"
+          defaultValue={initialExternalUrl}
+          className={INPUT}
+        />
       </div>
-      <button type="submit">Simpan</button>
+      <button type="submit" className={BUTTON_PRIMARY}>
+        Simpan
+      </button>
     </form>
   );
 }

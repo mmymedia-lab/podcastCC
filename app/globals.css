@@ -1,4 +1,45 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — Podcast Prep & Execution
+ *
+ * Palette: emerald as primary (calm, trustworthy — fits an internal tool
+ * for a pesantren/yayasan context) over a warm slate neutral scale.
+ * Stage colors give each of the 7 PRD stages a distinct, consistent badge
+ * color used everywhere a stage is shown (episode hub, board, list rows).
+ */
+@theme {
+  --color-primary-50: #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  --color-stage-bank-tema: #64748b;
+  --color-stage-bank-tema-bg: #f1f5f9;
+  --color-stage-riset-outline: #2563eb;
+  --color-stage-riset-outline-bg: #eff6ff;
+  --color-stage-pra-produksi: #d97706;
+  --color-stage-pra-produksi-bg: #fffbeb;
+  --color-stage-panduan-eksekusi: #059669;
+  --color-stage-panduan-eksekusi-bg: #ecfdf5;
+  --color-stage-pasca-produksi: #7c3aed;
+  --color-stage-pasca-produksi-bg: #f5f3ff;
+  --color-stage-publish-distribusi: #0891b2;
+  --color-stage-publish-distribusi-bg: #ecfeff;
+  --color-stage-evaluasi: #e11d48;
+  --color-stage-evaluasi-bg: #fff1f2;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-sans);
+  color: #1e293b;
+  background-color: #f8fafc;
 }

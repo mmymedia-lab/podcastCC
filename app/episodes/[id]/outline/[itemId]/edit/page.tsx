@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { updateOutlineItemAction } from "../../actions";
+import { BUTTON_PRIMARY, FIELD_GROUP, FORM, H1, INPUT, LABEL, PAGE, TEXTAREA } from "@/lib/ui-classes";
 
 export default async function EditOutlineItemPage({
   params,
@@ -15,23 +16,30 @@ export default async function EditOutlineItemPage({
   if (!item || item.episodeId !== episodeId) notFound();
 
   return (
-    <main>
-      <h1>Edit Poin Bicara</h1>
-      <form action={updateOutlineItemAction.bind(null, episodeId, item.id)}>
-        <div>
-          <label htmlFor="content">Poin bicara</label>
-          <textarea id="content" name="content" defaultValue={item.content} required />
+    <main className={PAGE}>
+      <h1 className={H1}>Edit Poin Bicara</h1>
+      <form action={updateOutlineItemAction.bind(null, episodeId, item.id)} className={FORM}>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="content" className={LABEL}>
+            Poin bicara
+          </label>
+          <textarea id="content" name="content" defaultValue={item.content} required className={TEXTAREA} />
         </div>
-        <div>
-          <label htmlFor="referenceUrl">Link referensi (opsional)</label>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="referenceUrl" className={LABEL}>
+            Link referensi (opsional)
+          </label>
           <input
             id="referenceUrl"
             name="referenceUrl"
             type="url"
             defaultValue={item.referenceUrl ?? ""}
+            className={INPUT}
           />
         </div>
-        <button type="submit">Simpan</button>
+        <button type="submit" className={BUTTON_PRIMARY}>
+          Simpan
+        </button>
       </form>
     </main>
   );

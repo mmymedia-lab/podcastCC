@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { ShowNotesForm } from "./show-notes-form";
+import { BACK_LINK, H1, PAGE } from "@/lib/ui-classes";
 
 export default async function ShowNotesPage({
   params,
@@ -22,11 +23,13 @@ export default async function ShowNotesPage({
   const outlineText = outlineItems.map((item) => `- ${item.content}`).join("\n");
 
   return (
-    <main>
-      <p>
-        <Link href={`/episodes/${episodeId}`}>← {episode.title}</Link>
+    <main className={PAGE}>
+      <p className="mb-2">
+        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
+          ← {episode.title}
+        </Link>
       </p>
-      <h1>Show Notes: {episode.title}</h1>
+      <h1 className={H1}>Show Notes: {episode.title}</h1>
 
       <ShowNotesForm
         episodeId={episodeId}

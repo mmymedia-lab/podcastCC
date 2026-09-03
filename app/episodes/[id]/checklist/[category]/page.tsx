@@ -4,6 +4,22 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { CHECKLIST_CATEGORY_LABELS, slugToCategory } from "../categories";
 import { createChecklistItemAction, deleteChecklistItemAction, toggleChecklistItemAction } from "../actions";
+import {
+  BACK_LINK,
+  BUTTON_DANGER,
+  BUTTON_GHOST,
+  BUTTON_PRIMARY,
+  CARD,
+  CARD_LIST,
+  EMPTY_STATE,
+  FIELD_GROUP,
+  FORM,
+  H1,
+  H2,
+  INPUT,
+  LABEL,
+  PAGE,
+} from "@/lib/ui-classes";
 
 export default async function ChecklistPage({
   params,
@@ -25,21 +41,20 @@ export default async function ChecklistPage({
   });
 
   return (
-    <main>
-      <p>
-        <Link href={`/episodes/${episodeId}`}>← {episode.title}</Link>
+    <main className={PAGE}>
+      <p className="mb-2">
+        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
+          ← {episode.title}
+        </Link>
       </p>
-      <h1>
+      <h1 className={H1}>
         {CHECKLIST_CATEGORY_LABELS[category]}: {episode.title}
       </h1>
 
-      <ul>
+      <ul className={CARD_LIST}>
         {items.map((item) => (
-          <li key={item.id}>
-            <form
-              action={toggleChecklistItemAction.bind(null, episodeId, slug, item.id)}
-              style={{ display: "inline" }}
-            >
+          <li key={item.id} className={`${CARD} flex items-center gap-3`}>
+            <form action={toggleChecklistItemAction.bind(null, episodeId, slug, item.id)}>
               <button
                 type="submit"
                 aria-pressed={item.isDone}
@@ -48,32 +63,39 @@ export default async function ChecklistPage({
                     ? `Tandai "${item.label}" belum selesai`
                     : `Tandai "${item.label}" selesai`
                 }
-                style={{ minWidth: "2.5rem", minHeight: "2.5rem" }}
+                className={`${BUTTON_GHOST} text-lg`}
               >
                 {item.isDone ? "☑" : "☐"}
               </button>
             </form>
-            <span style={{ textDecoration: item.isDone ? "line-through" : undefined }}>
+            <span
+              className={`flex-1 text-sm ${
+                item.isDone ? "text-slate-400 line-through" : "text-slate-900"
+              }`}
+            >
               {item.label}
             </span>
-            <form
-              action={deleteChecklistItemAction.bind(null, episodeId, slug, item.id)}
-              style={{ display: "inline" }}
-            >
-              <button type="submit">Hapus</button>
+            <form action={deleteChecklistItemAction.bind(null, episodeId, slug, item.id)}>
+              <button type="submit" className={BUTTON_DANGER}>
+                Hapus
+              </button>
             </form>
           </li>
         ))}
-        {items.length === 0 && <p>Belum ada item checklist.</p>}
+        {items.length === 0 && <p className={EMPTY_STATE}>Belum ada item checklist.</p>}
       </ul>
 
-      <h2>Tambah Item</h2>
-      <form action={createChecklistItemAction.bind(null, episodeId, category, slug)}>
-        <div>
-          <label htmlFor="label">Item</label>
-          <input id="label" name="label" required />
+      <h2 className={H2}>Tambah Item</h2>
+      <form action={createChecklistItemAction.bind(null, episodeId, category, slug)} className={FORM}>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="label" className={LABEL}>
+            Item
+          </label>
+          <input id="label" name="label" required className={INPUT} />
         </div>
-        <button type="submit">Tambah</button>
+        <button type="submit" className={BUTTON_PRIMARY}>
+          Tambah
+        </button>
       </form>
     </main>
   );

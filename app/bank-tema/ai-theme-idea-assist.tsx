@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createThemeIdeaFromTitleAction } from "./actions";
+import { BUTTON_PRIMARY, BUTTON_SECONDARY, INPUT } from "@/lib/ui-classes";
 
 export function AiThemeIdeaAssist() {
   const [keyword, setKeyword] = useState("");
@@ -33,29 +34,37 @@ export function AiThemeIdeaAssist() {
   }
 
   return (
-    <div style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem" }}>
-      <h2>Bantuan AI: Ide Topik</h2>
-      <input
-        value={keyword}
-        onChange={(event) => setKeyword(event.target.value)}
-        placeholder="Kata kunci/kategori"
-      />{" "}
-      <button onClick={requestIdeas} disabled={status === "loading" || !keyword.trim()}>
-        {status === "loading" ? "Meminta..." : "Minta Ide AI"}
-      </button>
+    <div className="mb-4 rounded-lg border border-primary-100 bg-primary-50 p-4">
+      <h2 className="mb-2 text-sm font-semibold text-primary-800">Bantuan AI: Ide Topik</h2>
+      <div className="flex flex-wrap gap-2">
+        <input
+          value={keyword}
+          onChange={(event) => setKeyword(event.target.value)}
+          placeholder="Kata kunci/kategori"
+          className={`${INPUT} max-w-xs`}
+        />
+        <button
+          onClick={requestIdeas}
+          disabled={status === "loading" || !keyword.trim()}
+          className={BUTTON_PRIMARY}
+        >
+          {status === "loading" ? "Meminta..." : "Minta Ide AI"}
+        </button>
+      </div>
       {status === "error" && (
-        <p role="alert">{errorMessage} — kamu tetap bisa isi manual di bawah.</p>
+        <p role="alert" className="mt-2 text-sm text-danger-700">
+          {errorMessage} — kamu tetap bisa isi manual di bawah.
+        </p>
       )}
       {suggestions.length > 0 && (
-        <ul>
+        <ul className="mt-3 space-y-2">
           {suggestions.map((suggestion, index) => (
-            <li key={index}>
-              {suggestion}{" "}
-              <form
-                action={createThemeIdeaFromTitleAction.bind(null, suggestion)}
-                style={{ display: "inline" }}
-              >
-                <button type="submit">+ Tambah</button>
+            <li key={index} className="flex items-center justify-between gap-2 text-sm">
+              <span>{suggestion}</span>
+              <form action={createThemeIdeaFromTitleAction.bind(null, suggestion)}>
+                <button type="submit" className={BUTTON_SECONDARY}>
+                  + Tambah
+                </button>
               </form>
             </li>
           ))}
