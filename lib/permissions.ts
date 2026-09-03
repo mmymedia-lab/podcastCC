@@ -1,6 +1,6 @@
 import { EpisodeRoleType, EpisodeStage } from "@prisma/client";
 import { prisma } from "./prisma";
-import { requireSession } from "./session";
+import { requireSession, resolveUserId } from "./session";
 
 // Which roles may edit each stage. This mapping is this project's own
 // decision (PRD.md flagged issue #16 as needing one — not fully specified
@@ -64,7 +64,7 @@ export async function canEditStage(
  */
 export async function requireEditableStage(episodeId: string, stage: EpisodeStage) {
   const session = await requireSession();
-  const userId = session.user?.id;
+  const userId = await resolveUserId(session);
   if (!userId) {
     throw new Error("Sesi tidak valid, silakan login ulang.");
   }
