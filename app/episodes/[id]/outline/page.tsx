@@ -45,7 +45,12 @@ export default async function OutlinePage({
               action={moveOutlineItemAction.bind(null, episodeId, item.id, "up")}
               style={{ display: "inline" }}
             >
-              <button type="submit" disabled={index === 0}>
+              <button
+                type="submit"
+                disabled={index === 0}
+                aria-label="Pindahkan poin bicara ke atas"
+                style={{ minWidth: "2.5rem", minHeight: "2.5rem" }}
+              >
                 ↑
               </button>
             </form>
@@ -53,7 +58,12 @@ export default async function OutlinePage({
               action={moveOutlineItemAction.bind(null, episodeId, item.id, "down")}
               style={{ display: "inline" }}
             >
-              <button type="submit" disabled={index === items.length - 1}>
+              <button
+                type="submit"
+                disabled={index === items.length - 1}
+                aria-label="Pindahkan poin bicara ke bawah"
+                style={{ minWidth: "2.5rem", minHeight: "2.5rem" }}
+              >
                 ↓
               </button>
             </form>
