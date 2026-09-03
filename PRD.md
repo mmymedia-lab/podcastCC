@@ -151,5 +151,6 @@ Hasil AI selalu berupa draft yang harus ditinjau/diedit manual sebelum disimpan 
 
 ## Further Notes
 
+- **TODO sebelum project dianggap "finishing"**: poles tampilan pakai Tailwind atau design system. Saat ini seluruh app (~25 halaman) murni HTML default tanpa `className` sama sekali — cuma 4 baris di `app/globals.css` (margin reset + font). Ini keputusan sadar untuk memprioritaskan fungsionalitas dulu (PRD MoSCoW di atas tidak menyebut visual design), tapi jangan sampai terlewat saat masuk tahap finishing. Pertimbangkan skill `frontend-design` (styling langsung, cepat) atau `ui-ux-pro-max` (kalau mau design system/token yang konsisten lintas ~25 halaman sekaligus).
 - Kandidat fitur v2 (belum disepakati, tidak dikerjakan sekarang): reminder jadwal rekaman, integrasi API publish otomatis, memperluas bantuan AI ke titik lain (mis. saran judul/deskripsi publish) kalau tiga titik awal terbukti berguna
 - Precedent internal yang relevan: pola "internal tool tervalidasi lalu digeneralisasi" pernah dicatat di riset workflow vibe coding sebelumnya (lihat `vibe-coding-workflow-dan-peluang-produk.md`, bagian 6.6) — bisa jadi arah lanjutan kalau suatu saat aplikasi ini ingin ditawarkan ke organisasi lain, tapi itu keputusan terpisah yang belum diambil.

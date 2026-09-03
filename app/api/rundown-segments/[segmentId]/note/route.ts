@@ -3,13 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canEditStage } from "@/lib/permissions";
+import { resolveUserId } from "@/lib/session";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ segmentId: string }> },
 ) {
   const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
+  const userId = await resolveUserId(session);
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

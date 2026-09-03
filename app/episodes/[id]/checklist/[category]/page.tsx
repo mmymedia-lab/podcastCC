@@ -43,7 +43,11 @@ export default async function ChecklistPage({
               <button
                 type="submit"
                 aria-pressed={item.isDone}
-                aria-label={item.isDone ? `Tandai "${item.label}" belum selesai` : `Tandai "${item.label}" selesai`}
+                aria-label={
+                  item.isDone
+                    ? `Tandai "${item.label}" belum selesai`
+                    : `Tandai "${item.label}" selesai`
+                }
                 style={{ minWidth: "2.5rem", minHeight: "2.5rem" }}
               >
                 {item.isDone ? "☑" : "☐"}
