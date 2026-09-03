@@ -39,7 +39,12 @@ export default async function GuestQuestionsPage({
               action={moveGuestQuestionAction.bind(null, episodeId, item.id, "up")}
               style={{ display: "inline" }}
             >
-              <button type="submit" disabled={index === 0}>
+              <button
+                type="submit"
+                disabled={index === 0}
+                aria-label="Pindahkan pertanyaan ke atas"
+                style={{ minWidth: "2.5rem", minHeight: "2.5rem" }}
+              >
                 ↑
               </button>
             </form>
@@ -47,7 +52,12 @@ export default async function GuestQuestionsPage({
               action={moveGuestQuestionAction.bind(null, episodeId, item.id, "down")}
               style={{ display: "inline" }}
             >
-              <button type="submit" disabled={index === items.length - 1}>
+              <button
+                type="submit"
+                disabled={index === items.length - 1}
+                aria-label="Pindahkan pertanyaan ke bawah"
+                style={{ minWidth: "2.5rem", minHeight: "2.5rem" }}
+              >
                 ↓
               </button>
             </form>

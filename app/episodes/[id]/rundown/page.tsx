@@ -44,7 +44,12 @@ export default async function RundownPage({
               action={moveRundownSegmentAction.bind(null, episodeId, segment.id, "up")}
               style={{ display: "inline" }}
             >
-              <button type="submit" disabled={index === 0}>
+              <button
+                type="submit"
+                disabled={index === 0}
+                aria-label="Pindahkan segmen ke atas"
+                style={{ minWidth: "2.5rem", minHeight: "2.5rem" }}
+              >
                 ↑
               </button>
             </form>
@@ -52,7 +57,12 @@ export default async function RundownPage({
               action={moveRundownSegmentAction.bind(null, episodeId, segment.id, "down")}
               style={{ display: "inline" }}
             >
-              <button type="submit" disabled={index === segments.length - 1}>
+              <button
+                type="submit"
+                disabled={index === segments.length - 1}
+                aria-label="Pindahkan segmen ke bawah"
+                style={{ minWidth: "2.5rem", minHeight: "2.5rem" }}
+              >
                 ↓
               </button>
             </form>
