@@ -5,6 +5,7 @@ import { GeminiConfigError, GeminiRequestError, generateWithGemini } from "@/lib
 import { resolveUserId } from "@/lib/session";
 import { canEditStage } from "@/lib/permissions";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
+import { getUserGeminiApiKey } from "@/lib/user-gemini-key";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -42,7 +43,8 @@ export async function POST(request: Request) {
   const prompt = `Berdasarkan outline episode podcast berikut:\n\n${outlineText}\n\nBuatkan draft show notes singkat dalam Bahasa Indonesia (ringkasan episode + poin-poin utama), format paragraf pendek diikuti bullet list.`;
 
   try {
-    const draft = await generateWithGemini(prompt);
+    const userApiKey = await getUserGeminiApiKey(userId);
+    const draft = await generateWithGemini(prompt, userApiKey);
     return NextResponse.json({ draft });
   } catch (error) {
     if (error instanceof GeminiConfigError || error instanceof GeminiRequestError) {

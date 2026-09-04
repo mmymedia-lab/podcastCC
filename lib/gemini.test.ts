@@ -35,6 +35,19 @@ describe("generateWithGemini", () => {
     expect(options.headers["x-goog-api-key"]).toBe("test-api-key");
   });
 
+  it("uses the override key instead of the env var when provided", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ candidates: [{ content: { parts: [{ text: "hasil" }] } }] }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await generateWithGemini("halo", "user-specific-key");
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.headers["x-goog-api-key"]).toBe("user-specific-key");
+  });
+
   it("throws GeminiRequestError with a clear message on a 429", async () => {
     vi.stubGlobal(
       "fetch",

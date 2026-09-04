@@ -7,9 +7,12 @@ export class GeminiRequestError extends Error {}
  * Thin wrapper over the Gemini REST API. Never called from the client —
  * the API key stays server-side (see PRD.md: credentials in .env, never
  * hardcoded, never sent to the browser).
+ *
+ * `apiKeyOverride` lets a caller use a specific user's own Gemini key
+ * (see lib/user-gemini-key.ts) instead of the workspace-wide env var.
  */
-export async function generateWithGemini(prompt: string): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY;
+export async function generateWithGemini(prompt: string, apiKeyOverride?: string): Promise<string> {
+  const apiKey = apiKeyOverride || process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new GeminiConfigError("GEMINI_API_KEY belum diisi di .env.");
   }
