@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createThemeIdeaFromTitleAction } from "./actions";
+import { CopyButton } from "@/components/ui/CopyButton";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, INPUT } from "@/lib/ui-classes";
 
 export function AiThemeIdeaAssist() {
@@ -61,11 +62,14 @@ export function AiThemeIdeaAssist() {
           {suggestions.map((suggestion, index) => (
             <li key={index} className="flex items-center justify-between gap-2 text-sm">
               <span>{suggestion}</span>
-              <form action={createThemeIdeaFromTitleAction.bind(null, suggestion)}>
-                <button type="submit" className={BUTTON_SECONDARY}>
-                  + Tambah
-                </button>
-              </form>
+              <div className="flex items-center gap-2">
+                <CopyButton text={suggestion} />
+                <form action={createThemeIdeaFromTitleAction.bind(null, suggestion)}>
+                  <button type="submit" className={BUTTON_SECONDARY}>
+                    + Tambah
+                  </button>
+                </form>
+              </div>
             </li>
           ))}
         </ul>

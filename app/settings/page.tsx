@@ -52,6 +52,26 @@ export default async function SettingsPage() {
 
       <h2 className={H2}>API Key Gemini Kamu</h2>
       <div className={CARD}>
+        <div className="mb-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
+          <p className="mb-1 font-medium text-slate-700">Cara mendapatkan API key Gemini:</p>
+          <ol className="list-decimal space-y-0.5 pl-4">
+            <li>
+              Buka{" "}
+              <a
+                href="https://aistudio.google.com/app/apikey"
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary-700 hover:underline"
+              >
+                Google AI Studio
+              </a>{" "}
+              dan login pakai akun Google kamu.
+            </li>
+            <li>Klik &quot;Create API key&quot;.</li>
+            <li>Salin key yang muncul (formatnya diawali <code>AIza...</code>).</li>
+            <li>Tempel di kolom di bawah ini, lalu klik Simpan API Key.</li>
+          </ol>
+        </div>
         <p className="mb-3 text-sm text-slate-600">
           Status:{" "}
           <strong className="text-slate-900">

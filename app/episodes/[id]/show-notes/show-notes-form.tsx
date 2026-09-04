@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { updateShowNotesAction } from "./actions";
+import { CopyButton } from "@/components/ui/CopyButton";
 import {
   BUTTON_PRIMARY,
   BUTTON_SECONDARY,
@@ -74,6 +75,7 @@ export function ShowNotesForm({
             >
               {aiStatus === "loading" ? "Membuat draft..." : "Draft dengan AI"}
             </button>
+            {draft && <CopyButton text={draft} />}
           </div>
           {aiStatus === "error" && (
             <p role="alert" className="mt-2 text-sm text-danger-700">
