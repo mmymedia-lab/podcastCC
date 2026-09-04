@@ -1,11 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { CHECKLIST_CATEGORY_LABELS, slugToCategory } from "../categories";
 import { createChecklistItemAction, deleteChecklistItemAction, toggleChecklistItemAction } from "../actions";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
-  BACK_LINK,
   BUTTON_DANGER,
   BUTTON_GHOST,
   BUTTON_PRIMARY,
@@ -42,11 +41,14 @@ export default async function ChecklistPage({
 
   return (
     <main className={PAGE}>
-      <p className="mb-2">
-        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
-          ← {episode.title}
-        </Link>
-      </p>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Episode", href: "/episodes" },
+          { label: episode.title, href: `/episodes/${episodeId}` },
+          { label: CHECKLIST_CATEGORY_LABELS[category] },
+        ]}
+      />
       <h1 className={H1}>
         {CHECKLIST_CATEGORY_LABELS[category]}: {episode.title}
       </h1>

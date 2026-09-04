@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { createTimestampMarkerAction, deleteTimestampMarkerAction } from "./actions";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
-  BACK_LINK,
   BUTTON_DANGER,
   BUTTON_PRIMARY,
   BUTTON_SECONDARY,
@@ -38,11 +38,14 @@ export default async function TimestampsPage({
 
   return (
     <main className={PAGE}>
-      <p className="mb-2">
-        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
-          ← {episode.title}
-        </Link>
-      </p>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Episode", href: "/episodes" },
+          { label: episode.title, href: `/episodes/${episodeId}` },
+          { label: "Timestamp / Chapter" },
+        ]}
+      />
       <h1 className={H1}>Timestamp/Chapter: {episode.title}</h1>
 
       <ul className={CARD_LIST}>

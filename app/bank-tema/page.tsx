@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { deleteThemeIdeaAction } from "./actions";
 import { convertThemeIdeaToEpisodeAction } from "../episodes/actions";
 import { AiThemeIdeaAssist } from "./ai-theme-idea-assist";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
   BUTTON_DANGER,
   BUTTON_PRIMARY,
@@ -35,6 +36,7 @@ export default async function BankTemaPage({
 
   return (
     <main className={PAGE}>
+      <Breadcrumb items={[{ label: "Beranda", href: "/dashboard" }, { label: "Bank Tema" }]} />
       <div className="mb-6 flex items-center justify-between">
         <h1 className={`${H1} mb-0 mt-0`}>Bank Tema</h1>
         <Link href="/bank-tema/new" className={BUTTON_PRIMARY}>

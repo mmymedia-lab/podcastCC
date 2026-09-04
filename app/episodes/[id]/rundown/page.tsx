@@ -7,8 +7,8 @@ import {
   deleteRundownSegmentAction,
   moveRundownSegmentAction,
 } from "./actions";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
-  BACK_LINK,
   BUTTON_DANGER,
   BUTTON_GHOST,
   BUTTON_PRIMARY,
@@ -44,11 +44,14 @@ export default async function RundownPage({
 
   return (
     <main className={PAGE}>
-      <p className="mb-2">
-        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
-          ← {episode.title}
-        </Link>
-      </p>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Episode", href: "/episodes" },
+          { label: episode.title, href: `/episodes/${episodeId}` },
+          { label: "Rundown & Mode Eksekusi" },
+        ]}
+      />
       <div className="mb-6 flex items-center justify-between">
         <h1 className={`${H1} mb-0`}>Rundown: {episode.title}</h1>
         <Link href={`/episodes/${episodeId}/execute`} className={BUTTON_PRIMARY}>

@@ -2,11 +2,9 @@
 
 import { useState, type FormEvent } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { BUTTON_PRIMARY, FIELD_GROUP, FORM, INPUT, LABEL } from "@/lib/ui-classes";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +28,13 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/dashboard");
+    // A hard navigation, not router.push(): the root layout reads the
+    // session server-side to decide whether to render the nav bar, and
+    // that layout is a shared ancestor of every route — Next.js reuses its
+    // pre-login (no-session) render across client-side navigations instead
+    // of re-fetching it, so a soft push here would leave the nav bar
+    // missing until the next full page reload.
+    window.location.href = "/dashboard";
   }
 
   return (
