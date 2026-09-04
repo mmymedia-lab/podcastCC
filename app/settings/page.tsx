@@ -2,6 +2,7 @@ import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { clearGeminiApiKeyAction, setGeminiApiKeyAction, updateWorkspaceModeAction } from "./actions";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { BUTTON_DANGER, BUTTON_PRIMARY, CARD, FIELD_GROUP, FORM, H1, H2, HELP_TEXT, INPUT, LABEL, PAGE } from "@/lib/ui-classes";
 
 export default async function SettingsPage() {
@@ -15,6 +16,7 @@ export default async function SettingsPage() {
 
   return (
     <main className={PAGE}>
+      <Breadcrumb items={[{ label: "Beranda", href: "/dashboard" }, { label: "Pengaturan" }]} />
       <h1 className={H1}>Pengaturan Workspace</h1>
       <p className="mb-4 text-sm text-slate-600">
         Mode saat ini: <strong className="text-slate-900">{settings.mode === "SOLO" ? "Solo" : "Tim"}</strong>

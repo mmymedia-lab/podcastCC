@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Segment = {
@@ -18,10 +19,16 @@ export function formatElapsed(ms: number): string {
   return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
+const EXIT_LINK_CLASS =
+  "fixed right-4 top-4 z-10 rounded-lg border border-slate-700 bg-slate-900/80 px-4 py-2 text-sm text-slate-300 " +
+  "backdrop-blur transition-colors hover:border-slate-500 hover:bg-slate-800 hover:text-slate-50";
+
 export function ExecuteClient({
+  episodeId,
   episodeTitle,
   segments,
 }: {
+  episodeId: string;
   episodeTitle: string;
   segments: Segment[];
 }) {
@@ -75,6 +82,9 @@ export function ExecuteClient({
   if (!activeSegment) {
     return (
       <main className="min-h-screen bg-slate-950 px-8 py-12 text-slate-50 md:px-16 md:py-16">
+        <Link href={`/episodes/${episodeId}/rundown`} className={EXIT_LINK_CLASS}>
+          ✕ Keluar
+        </Link>
         <h1 className="text-2xl font-semibold">{episodeTitle}</h1>
         <p className="mt-2 text-slate-400">
           Belum ada segmen rundown. Tambahkan dulu di halaman Rundown episode ini.
@@ -85,6 +95,9 @@ export function ExecuteClient({
 
   return (
     <main className="min-h-screen bg-slate-950 px-8 py-12 text-lg leading-relaxed text-slate-50 md:px-16 md:py-16">
+      <Link href={`/episodes/${episodeId}/rundown`} className={EXIT_LINK_CLASS}>
+        ✕ Keluar
+      </Link>
       <p className="mb-0 text-base text-slate-500">{episodeTitle}</p>
       <p className="mt-1 text-base text-slate-500">
         Segmen {activeIndex + 1} dari {segments.length} · Estimasi {activeSegment.estimatedMinutes} menit

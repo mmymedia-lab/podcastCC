@@ -10,8 +10,6 @@
 export const PAGE = "mx-auto max-w-3xl px-4 py-8 sm:px-6";
 export const PAGE_WIDE = "mx-auto max-w-5xl px-4 py-8 sm:px-6";
 
-export const BACK_LINK = "text-sm text-slate-500 hover:text-primary-700";
-
 export const H1 = "mt-2 mb-6 text-2xl font-semibold tracking-tight text-slate-900";
 export const H2 = "mt-8 mb-3 text-lg font-semibold text-slate-900";
 

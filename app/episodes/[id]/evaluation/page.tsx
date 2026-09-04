@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
@@ -7,8 +6,8 @@ import {
   createEvaluationNoteAction,
   deleteEvaluationNoteAction,
 } from "./actions";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
-  BACK_LINK,
   BUTTON_DANGER,
   BUTTON_PRIMARY,
   BUTTON_SECONDARY,
@@ -42,11 +41,14 @@ export default async function EvaluationPage({
 
   return (
     <main className={PAGE}>
-      <p className="mb-2">
-        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
-          ← {episode.title}
-        </Link>
-      </p>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Episode", href: "/episodes" },
+          { label: episode.title, href: `/episodes/${episodeId}` },
+          { label: "Evaluasi" },
+        ]}
+      />
       <h1 className={H1}>Evaluasi: {episode.title}</h1>
 
       <ul className={CARD_LIST}>

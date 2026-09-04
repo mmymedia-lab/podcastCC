@@ -2,8 +2,8 @@ import Link from "next/link";
 import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { deleteUserAction } from "./actions";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
-  BACK_LINK,
   BUTTON_DANGER,
   BUTTON_PRIMARY,
   BUTTON_SECONDARY,
@@ -21,11 +21,7 @@ export default async function UsersPage() {
 
   return (
     <main className={PAGE}>
-      <p className="mb-2">
-        <Link href="/settings" className={BACK_LINK}>
-          ← Pengaturan
-        </Link>
-      </p>
+      <Breadcrumb items={[{ label: "Beranda", href: "/dashboard" }, { label: "Pengguna" }]} />
       <div className="mb-6 flex items-center justify-between">
         <h1 className={`${H1} mb-0`}>Pengguna</h1>
         <Link href="/users/new" className={BUTTON_PRIMARY}>
