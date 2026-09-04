@@ -4,6 +4,7 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { STAGE_LABELS, STAGE_ORDER } from "../episodes/stages";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { H1, PAGE_WIDE } from "@/lib/ui-classes";
 
 export default async function BoardPage() {
@@ -20,6 +21,7 @@ export default async function BoardPage() {
 
   return (
     <main className={PAGE_WIDE}>
+      <Breadcrumb items={[{ label: "Beranda", href: "/dashboard" }, { label: "Board" }]} />
       <h1 className={H1}>Board</h1>
       <div className="flex gap-4 overflow-x-auto pb-2">
         {STAGE_ORDER.map((stage) => {

@@ -4,8 +4,8 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { createOutlineItemAction, deleteOutlineItemAction, moveOutlineItemAction } from "./actions";
 import { AiOutlineAssist } from "./ai-outline-assist";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
-  BACK_LINK,
   BUTTON_DANGER,
   BUTTON_GHOST,
   BUTTON_PRIMARY,
@@ -41,11 +41,14 @@ export default async function OutlinePage({
 
   return (
     <main className={PAGE}>
-      <p className="mb-2">
-        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
-          ← {episode.title}
-        </Link>
-      </p>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Episode", href: "/episodes" },
+          { label: episode.title, href: `/episodes/${episodeId}` },
+          { label: "Riset & Outline" },
+        ]}
+      />
       <h1 className={H1}>Outline: {episode.title}</h1>
 
       <AiOutlineAssist episodeId={episodeId} episodeTitle={episode.title} />

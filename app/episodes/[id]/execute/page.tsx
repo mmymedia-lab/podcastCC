@@ -26,5 +26,5 @@ export default async function ExecutePage({
     },
   });
 
-  return <ExecuteClient episodeTitle={episode.title} segments={segments} />;
+  return <ExecuteClient episodeId={episodeId} episodeTitle={episode.title} segments={segments} />;
 }

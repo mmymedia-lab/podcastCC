@@ -6,6 +6,7 @@ import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { STAGE_LABELS, STAGE_ORDER } from "../stages";
 import { updateEpisodeStageAction, updateRecordingScheduleAction } from "../actions";
 import { StageBadge } from "@/components/ui/StageBadge";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { BUTTON_PRIMARY, CARD, FIELD_GROUP, H1, H2, INPUT, LABEL, PAGE_WIDE } from "@/lib/ui-classes";
 
 function toDatetimeLocalValue(date: Date | null): string {
@@ -45,6 +46,13 @@ export default async function EpisodeDetailPage({
 
   return (
     <main className={PAGE_WIDE}>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Episode", href: "/episodes" },
+          { label: episode.title },
+        ]}
+      />
       <div className="mb-6">
         <h1 className={`${H1} mb-2`}>{episode.title}</h1>
         <StageBadge stage={episode.stage} />

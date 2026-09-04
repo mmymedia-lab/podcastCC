@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { updatePublishMetadataAction } from "./actions";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
-  BACK_LINK,
   BUTTON_PRIMARY,
   CARD,
   FIELD_GROUP,
@@ -29,11 +29,14 @@ export default async function PublishPage({
 
   return (
     <main className={PAGE}>
-      <p className="mb-2">
-        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
-          ← {episode.title}
-        </Link>
-      </p>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Episode", href: "/episodes" },
+          { label: episode.title, href: `/episodes/${episodeId}` },
+          { label: "Publish & Distribusi" },
+        ]}
+      />
       <h1 className={H1}>Publish & Distribusi: {episode.title}</h1>
 
       <form action={updatePublishMetadataAction.bind(null, episodeId)} className={FORM}>

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
-import { LogoutButton } from "./logout-button";
 import { CARD, H1, PAGE } from "@/lib/ui-classes";
 
 const NAV_ITEMS = [
@@ -37,10 +36,6 @@ export default async function DashboardPage() {
             <p className="text-sm text-slate-500">Kanban semua episode per tahap</p>
           </Link>
         )}
-      </div>
-
-      <div className="mt-8">
-        <LogoutButton />
       </div>
     </main>
   );

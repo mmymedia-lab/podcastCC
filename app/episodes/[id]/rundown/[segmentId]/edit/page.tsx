@@ -1,8 +1,20 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { updateRundownSegmentAction } from "../../actions";
-import { BUTTON_PRIMARY, FIELD_GROUP, FORM, H1, INPUT, LABEL, PAGE, TEXTAREA } from "@/lib/ui-classes";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import {
+  BUTTON_PRIMARY,
+  BUTTON_SECONDARY,
+  FIELD_GROUP,
+  FORM,
+  H1,
+  INPUT,
+  LABEL,
+  PAGE,
+  TEXTAREA,
+} from "@/lib/ui-classes";
 
 export default async function EditRundownSegmentPage({
   params,
@@ -15,8 +27,20 @@ export default async function EditRundownSegmentPage({
   const segment = await prisma.rundownSegment.findUnique({ where: { id: segmentId } });
   if (!segment || segment.episodeId !== episodeId) notFound();
 
+  const episode = await prisma.episode.findUnique({ where: { id: episodeId } });
+  if (!episode) notFound();
+
   return (
     <main className={PAGE}>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Episode", href: "/episodes" },
+          { label: episode.title, href: `/episodes/${episodeId}` },
+          { label: "Rundown & Mode Eksekusi", href: `/episodes/${episodeId}/rundown` },
+          { label: "Edit Segmen" },
+        ]}
+      />
       <h1 className={H1}>Edit Segmen Rundown</h1>
       <form action={updateRundownSegmentAction.bind(null, episodeId, segment.id)} className={FORM}>
         <div className={FIELD_GROUP}>
@@ -50,9 +74,14 @@ export default async function EditRundownSegmentPage({
             className={INPUT}
           />
         </div>
-        <button type="submit" className={BUTTON_PRIMARY}>
-          Simpan
-        </button>
+        <div className="flex gap-2">
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Simpan
+          </button>
+          <Link href={`/episodes/${episodeId}/rundown`} className={BUTTON_SECONDARY}>
+            Batal
+          </Link>
+        </div>
       </form>
     </main>
   );

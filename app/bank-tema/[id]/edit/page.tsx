@@ -1,8 +1,20 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { updateThemeIdeaAction } from "../../actions";
-import { BUTTON_PRIMARY, FIELD_GROUP, FORM, H1, INPUT, LABEL, PAGE, TEXTAREA } from "@/lib/ui-classes";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import {
+  BUTTON_PRIMARY,
+  BUTTON_SECONDARY,
+  FIELD_GROUP,
+  FORM,
+  H1,
+  INPUT,
+  LABEL,
+  PAGE,
+  TEXTAREA,
+} from "@/lib/ui-classes";
 
 export default async function EditThemeIdeaPage({
   params,
@@ -17,6 +29,13 @@ export default async function EditThemeIdeaPage({
 
   return (
     <main className={PAGE}>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Bank Tema", href: "/bank-tema" },
+          { label: "Edit Ide" },
+        ]}
+      />
       <h1 className={H1}>Edit Ide Topik</h1>
       <form action={updateThemeIdeaAction.bind(null, idea.id)} className={FORM}>
         <div className={FIELD_GROUP}>
@@ -42,9 +61,14 @@ export default async function EditThemeIdeaPage({
           </label>
           <input id="tags" name="tags" defaultValue={idea.tags.join(", ")} className={INPUT} />
         </div>
-        <button type="submit" className={BUTTON_PRIMARY}>
-          Simpan
-        </button>
+        <div className="flex gap-2">
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Simpan
+          </button>
+          <Link href="/bank-tema" className={BUTTON_SECONDARY}>
+            Batal
+          </Link>
+        </div>
       </form>
     </main>
   );

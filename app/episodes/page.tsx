@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { EpisodeStage } from "@prisma/client";
 import { STAGE_LABELS, STAGE_ORDER } from "./stages";
 import { StageBadge } from "@/components/ui/StageBadge";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { CARD, CARD_LIST, EMPTY_STATE, H1, PAGE } from "@/lib/ui-classes";
 
 export default async function EpisodesPage({
@@ -23,6 +24,7 @@ export default async function EpisodesPage({
 
   return (
     <main className={PAGE}>
+      <Breadcrumb items={[{ label: "Beranda", href: "/dashboard" }, { label: "Episode" }]} />
       <h1 className={H1}>Episode</h1>
 
       <nav aria-label="Filter tahap" className="mb-4 flex flex-wrap gap-2">

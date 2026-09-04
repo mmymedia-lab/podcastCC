@@ -1,8 +1,20 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { updateGuestAction } from "../../actions";
-import { BUTTON_PRIMARY, FIELD_GROUP, FORM, H1, INPUT, LABEL, PAGE, TEXTAREA } from "@/lib/ui-classes";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import {
+  BUTTON_PRIMARY,
+  BUTTON_SECONDARY,
+  FIELD_GROUP,
+  FORM,
+  H1,
+  INPUT,
+  LABEL,
+  PAGE,
+  TEXTAREA,
+} from "@/lib/ui-classes";
 
 export default async function EditGuestPage({
   params,
@@ -15,8 +27,20 @@ export default async function EditGuestPage({
   const guest = await prisma.guest.findUnique({ where: { id: guestId } });
   if (!guest || guest.episodeId !== episodeId) notFound();
 
+  const episode = await prisma.episode.findUnique({ where: { id: episodeId } });
+  if (!episode) notFound();
+
   return (
     <main className={PAGE}>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/dashboard" },
+          { label: "Episode", href: "/episodes" },
+          { label: episode.title, href: `/episodes/${episodeId}` },
+          { label: "Tamu & Narasumber", href: `/episodes/${episodeId}/guests` },
+          { label: "Edit Tamu" },
+        ]}
+      />
       <h1 className={H1}>Edit Tamu</h1>
       <form action={updateGuestAction.bind(null, episodeId, guest.id)} className={FORM}>
         <div className={FIELD_GROUP}>
@@ -42,9 +66,14 @@ export default async function EditGuestPage({
             className={TEXTAREA}
           />
         </div>
-        <button type="submit" className={BUTTON_PRIMARY}>
-          Simpan
-        </button>
+        <div className="flex gap-2">
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Simpan
+          </button>
+          <Link href={`/episodes/${episodeId}/guests`} className={BUTTON_SECONDARY}>
+            Batal
+          </Link>
+        </div>
       </form>
     </main>
   );
