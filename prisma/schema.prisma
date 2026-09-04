@@ -28,6 +28,9 @@ model User {
   // means this user has no key of their own and AI requests fall back to
   // the workspace-wide GEMINI_API_KEY env var (see lib/user-gemini-key.ts).
   geminiApiKeyEncrypted String?
+  // Whether this user has dismissed/finished the onboarding wizard at least
+  // once. Re-openable anytime from the nav bar regardless of this flag.
+  hasSeenOnboarding Boolean       @default(false)
   episodeRoles EpisodeRole[]
   createdAt    DateTime      @default(now())
 }
