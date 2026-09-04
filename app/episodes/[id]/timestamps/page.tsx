@@ -3,6 +3,22 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { createTimestampMarkerAction, deleteTimestampMarkerAction } from "./actions";
+import {
+  BACK_LINK,
+  BUTTON_DANGER,
+  BUTTON_PRIMARY,
+  BUTTON_SECONDARY,
+  CARD,
+  CARD_LIST,
+  EMPTY_STATE,
+  FIELD_GROUP,
+  FORM,
+  H1,
+  H2,
+  INPUT,
+  LABEL,
+  PAGE,
+} from "@/lib/ui-classes";
 
 export default async function TimestampsPage({
   params,
@@ -21,39 +37,55 @@ export default async function TimestampsPage({
   });
 
   return (
-    <main>
-      <p>
-        <Link href={`/episodes/${episodeId}`}>← {episode.title}</Link>
+    <main className={PAGE}>
+      <p className="mb-2">
+        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
+          ← {episode.title}
+        </Link>
       </p>
-      <h1>Timestamp/Chapter: {episode.title}</h1>
+      <h1 className={H1}>Timestamp/Chapter: {episode.title}</h1>
 
-      <ul>
+      <ul className={CARD_LIST}>
         {markers.map((marker) => (
-          <li key={marker.id}>
-            <strong>{marker.timeLabel}</strong> — {marker.label}{" "}
-            <Link href={`/episodes/${episodeId}/timestamps/${marker.id}/edit`}>Edit</Link>{" "}
-            <form
-              action={deleteTimestampMarkerAction.bind(null, episodeId, marker.id)}
-              style={{ display: "inline" }}
-            >
-              <button type="submit">Hapus</button>
-            </form>
+          <li key={marker.id} className={`${CARD} flex items-center justify-between gap-3`}>
+            <p className="text-sm text-slate-900">
+              <strong className="font-medium">{marker.timeLabel}</strong> — {marker.label}
+            </p>
+            <div className="flex shrink-0 items-center gap-2">
+              <Link
+                href={`/episodes/${episodeId}/timestamps/${marker.id}/edit`}
+                className={BUTTON_SECONDARY}
+              >
+                Edit
+              </Link>
+              <form action={deleteTimestampMarkerAction.bind(null, episodeId, marker.id)}>
+                <button type="submit" className={BUTTON_DANGER}>
+                  Hapus
+                </button>
+              </form>
+            </div>
           </li>
         ))}
-        {markers.length === 0 && <p>Belum ada timestamp/chapter.</p>}
+        {markers.length === 0 && <p className={EMPTY_STATE}>Belum ada timestamp/chapter.</p>}
       </ul>
 
-      <h2>Tambah Timestamp</h2>
-      <form action={createTimestampMarkerAction.bind(null, episodeId)}>
-        <div>
-          <label htmlFor="timeLabel">Waktu (mis. 00:12:34)</label>
-          <input id="timeLabel" name="timeLabel" placeholder="00:00:00" required />
+      <h2 className={H2}>Tambah Timestamp</h2>
+      <form action={createTimestampMarkerAction.bind(null, episodeId)} className={FORM}>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="timeLabel" className={LABEL}>
+            Waktu (mis. 00:12:34)
+          </label>
+          <input id="timeLabel" name="timeLabel" placeholder="00:00:00" required className={INPUT} />
         </div>
-        <div>
-          <label htmlFor="label">Label chapter</label>
-          <input id="label" name="label" required />
+        <div className={FIELD_GROUP}>
+          <label htmlFor="label" className={LABEL}>
+            Label chapter
+          </label>
+          <input id="label" name="label" required className={INPUT} />
         </div>
-        <button type="submit">Tambah</button>
+        <button type="submit" className={BUTTON_PRIMARY}>
+          Tambah
+        </button>
       </form>
     </main>
   );
