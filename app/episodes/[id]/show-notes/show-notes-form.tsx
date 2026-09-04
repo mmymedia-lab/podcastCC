@@ -25,7 +25,7 @@ export function ShowNotesForm({
       const response = await fetch("/api/ai/show-notes-draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ outlineText }),
+        body: JSON.stringify({ episodeId, outlineText }),
       });
       const data = await response.json();
       if (!response.ok) {

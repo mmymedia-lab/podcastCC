@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 
-export function AiOutlineAssist({ episodeTitle }: { episodeTitle: string }) {
+export function AiOutlineAssist({
+  episodeId,
+  episodeTitle,
+}: {
+  episodeId: string;
+  episodeTitle: string;
+}) {
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -14,7 +20,7 @@ export function AiOutlineAssist({ episodeTitle }: { episodeTitle: string }) {
       const response = await fetch("/api/ai/outline-draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ episodeTitle }),
+        body: JSON.stringify({ episodeId, episodeTitle }),
       });
       const data = await response.json();
       if (!response.ok) {
