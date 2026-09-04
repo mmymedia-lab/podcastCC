@@ -1,4 +1,7 @@
-const DEFAULT_MODEL = "gemini-2.0-flash";
+// gemini-2.0-flash was retired by Google; its API error pointed to this
+// as the replacement (confirmed working via direct API calls with a real
+// key — see PR that changed this constant).
+const DEFAULT_MODEL = "gemini-3.6-flash";
 
 export class GeminiConfigError extends Error {}
 export class GeminiRequestError extends Error {}
