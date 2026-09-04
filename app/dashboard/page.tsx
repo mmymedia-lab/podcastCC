@@ -1,6 +1,9 @@
 import Link from "next/link";
-import { requireSession } from "@/lib/session";
+import { requireSession, resolveUserId } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
+import { dismissOnboardingAction } from "./actions";
+import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 import { CARD, H1, PAGE } from "@/lib/ui-classes";
 
 const NAV_ITEMS = [
@@ -10,12 +13,24 @@ const NAV_ITEMS = [
   { href: "/users", label: "Pengguna", hint: "Kelola akun pengguna" },
 ];
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ panduan?: string }>;
+}) {
   const session = await requireSession();
   const settings = await getWorkspaceSettings();
+  const { panduan } = await searchParams;
+
+  const userId = await resolveUserId(session);
+  const user = userId
+    ? await prisma.user.findUnique({ where: { id: userId }, select: { hasSeenOnboarding: true } })
+    : null;
+  const showOnboarding = panduan === "1" || !user?.hasSeenOnboarding;
 
   return (
     <main className={PAGE}>
+      <OnboardingWizard initialOpen={showOnboarding} onFinishAction={dismissOnboardingAction} />
       <h1 className={H1}>Dashboard</h1>
       <p className="mb-6 text-sm text-slate-500">Masuk sebagai {session.user?.email}</p>
 
