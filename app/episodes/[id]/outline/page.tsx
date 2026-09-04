@@ -48,7 +48,7 @@ export default async function OutlinePage({
       </p>
       <h1 className={H1}>Outline: {episode.title}</h1>
 
-      <AiOutlineAssist episodeTitle={episode.title} />
+      <AiOutlineAssist episodeId={episodeId} episodeTitle={episode.title} />
 
       <ol className={CARD_LIST}>
         {items.map((item, index) => (

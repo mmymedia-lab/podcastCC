@@ -15,13 +15,16 @@ export async function generateWithGemini(prompt: string): Promise<string> {
   }
 
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
   let response: Response;
   try {
+    // The key goes in a header rather than the ?key= query param (both are
+    // accepted by this API) so it never ends up in server access logs or
+    // any request-URL logging middleware.
     response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
       }),
