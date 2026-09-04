@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { GeminiConfigError, GeminiRequestError, generateWithGemini } from "@/lib/gemini";
 import { resolveUserId } from "@/lib/session";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
+import { getUserGeminiApiKey } from "@/lib/user-gemini-key";
 
 // No stage-based gating here (unlike outline-draft/show-notes-draft): a
 // Bank Tema idea isn't tied to any episode yet, so there's no episodeId to
@@ -37,7 +38,8 @@ export async function POST(request: Request) {
   const prompt = `Berikan 5 ide topik podcast terkait kata kunci "${keyword}", dalam Bahasa Indonesia. Satu ide per baris, tanpa penomoran, tanpa penjelasan tambahan, cukup judul ide yang singkat dan menarik.`;
 
   try {
-    const text = await generateWithGemini(prompt);
+    const userApiKey = await getUserGeminiApiKey(userId);
+    const text = await generateWithGemini(prompt, userApiKey);
     const ideas = text
       .split("\n")
       .map((line) => line.replace(/^[-*\d.]+\s*/, "").trim())

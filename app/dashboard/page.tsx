@@ -7,7 +7,8 @@ import { CARD, H1, PAGE } from "@/lib/ui-classes";
 const NAV_ITEMS = [
   { href: "/bank-tema", label: "Bank Tema", hint: "Kumpulan ide topik episode" },
   { href: "/episodes", label: "Episode", hint: "Semua episode & tahapnya" },
-  { href: "/settings", label: "Pengaturan Workspace", hint: "Mode Solo/Tim" },
+  { href: "/settings", label: "Pengaturan Workspace", hint: "Mode Solo/Tim, API key Gemini" },
+  { href: "/users", label: "Pengguna", hint: "Kelola akun pengguna" },
 ];
 
 export default async function DashboardPage() {
