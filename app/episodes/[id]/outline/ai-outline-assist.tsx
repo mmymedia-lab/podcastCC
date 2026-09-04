@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CopyButton } from "@/components/ui/CopyButton";
 import { BUTTON_PRIMARY } from "@/lib/ui-classes";
 
 export function AiOutlineAssist({
@@ -54,9 +55,12 @@ export function AiOutlineAssist({
       )}
       {draft && (
         <>
-          <p className="mt-3 text-sm text-slate-700">
-            Salin poin yang relevan ke daftar poin bicara di bawah secara manual:
-          </p>
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <p className="text-sm text-slate-700">
+              Salin poin yang relevan ke daftar poin bicara di bawah secara manual:
+            </p>
+            <CopyButton text={draft} />
+          </div>
           <pre className="mt-2 whitespace-pre-wrap rounded-md bg-white p-3 text-sm text-slate-800">
             {draft}
           </pre>
