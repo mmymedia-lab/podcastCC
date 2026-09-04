@@ -1,4 +1,68 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — Podcast Prep & Execution
+ *
+ * Palette: emerald as primary (calm, trustworthy — fits an internal tool
+ * for a pesantren/yayasan context) over a warm slate neutral scale.
+ * Stage colors give each of the 7 PRD stages a distinct, consistent badge
+ * color used everywhere a stage is shown (episode hub, board, list rows).
+ */
+@theme {
+  --color-primary-50: #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  --color-stage-bank-tema: #64748b;
+  --color-stage-bank-tema-bg: #f1f5f9;
+  --color-stage-riset-outline: #2563eb;
+  --color-stage-riset-outline-bg: #eff6ff;
+  --color-stage-pra-produksi: #d97706;
+  --color-stage-pra-produksi-bg: #fffbeb;
+  --color-stage-panduan-eksekusi: #059669;
+  --color-stage-panduan-eksekusi-bg: #ecfdf5;
+  --color-stage-pasca-produksi: #7c3aed;
+  --color-stage-pasca-produksi-bg: #f5f3ff;
+  --color-stage-publish-distribusi: #0891b2;
+  --color-stage-publish-distribusi-bg: #ecfeff;
+  --color-stage-evaluasi: #e11d48;
+  --color-stage-evaluasi-bg: #fff1f2;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/*
+ * Ambient page background: two soft gradient blobs (primary emerald +
+ * riset-outline blue, both from the palette above) plus two crossing
+ * hairline grids (primary + bank-tema slate) forming a faint diagonal
+ * lattice — an abstract, "line fractal"-ish texture. Built entirely from
+ * existing design tokens via color-mix() so it re-tints automatically if
+ * the palette above ever changes, and kept faint enough (3-10% tint) to
+ * never threaten body text contrast.
+ *
+ * `<main>` on every page except the ones below (login, execute mode) has
+ * no background of its own, so this shows through in the page margins —
+ * on login and execute mode `<main>` sets its own full-viewport solid
+ * background, which naturally covers this without needing an override
+ * here. Execute mode in particular stays plain dark/minimal on purpose
+ * (PRD: full-screen, minim distraksi) — this ambient texture is
+ * deliberately not extended there.
+ */
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-sans);
+  color: #1e293b;
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(1200px circle at 100% 0%, color-mix(in srgb, var(--color-primary-600) 10%, transparent), transparent 60%),
+    radial-gradient(1000px circle at 0% 100%, color-mix(in srgb, var(--color-stage-riset-outline) 8%, transparent), transparent 55%),
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-primary-700) 5%, transparent) 0, color-mix(in srgb, var(--color-primary-700) 5%, transparent) 1px, transparent 1px, transparent 64px),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-stage-bank-tema) 5%, transparent) 0, color-mix(in srgb, var(--color-stage-bank-tema) 5%, transparent) 1px, transparent 1px, transparent 96px);
+  background-attachment: fixed;
 }

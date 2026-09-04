@@ -24,6 +24,10 @@ model User {
   email        String        @unique
   passwordHash String
   name         String?
+  // AES-256-GCM ciphertext (see lib/crypto.ts), never the raw key. Null
+  // means this user has no key of their own and AI requests fall back to
+  // the workspace-wide GEMINI_API_KEY env var (see lib/user-gemini-key.ts).
+  geminiApiKeyEncrypted String?
   episodeRoles EpisodeRole[]
   createdAt    DateTime      @default(now())
 }

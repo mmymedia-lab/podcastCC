@@ -3,6 +3,18 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { updatePublishMetadataAction } from "./actions";
+import {
+  BACK_LINK,
+  BUTTON_PRIMARY,
+  CARD,
+  FIELD_GROUP,
+  FORM,
+  H1,
+  INPUT,
+  LABEL,
+  PAGE,
+  TEXTAREA,
+} from "@/lib/ui-classes";
 
 export default async function PublishPage({
   params,
@@ -16,35 +28,60 @@ export default async function PublishPage({
   if (!episode) notFound();
 
   return (
-    <main>
-      <p>
-        <Link href={`/episodes/${episodeId}`}>← {episode.title}</Link>
+    <main className={PAGE}>
+      <p className="mb-2">
+        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
+          ← {episode.title}
+        </Link>
       </p>
-      <h1>Publish & Distribusi: {episode.title}</h1>
+      <h1 className={H1}>Publish & Distribusi: {episode.title}</h1>
 
-      <form action={updatePublishMetadataAction.bind(null, episodeId)}>
-        <div>
-          <label htmlFor="publishTitle">Judul final</label>
-          <input id="publishTitle" name="publishTitle" defaultValue={episode.publishTitle ?? ""} />
+      <form action={updatePublishMetadataAction.bind(null, episodeId)} className={FORM}>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="publishTitle" className={LABEL}>
+            Judul final
+          </label>
+          <input
+            id="publishTitle"
+            name="publishTitle"
+            defaultValue={episode.publishTitle ?? ""}
+            className={INPUT}
+          />
         </div>
-        <div>
-          <label htmlFor="publishDescription">Deskripsi</label>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="publishDescription" className={LABEL}>
+            Deskripsi
+          </label>
           <textarea
             id="publishDescription"
             name="publishDescription"
             defaultValue={episode.publishDescription ?? ""}
+            className={TEXTAREA}
           />
         </div>
-        <div>
-          <label htmlFor="publishTags">Tag (pisahkan dengan koma)</label>
-          <input id="publishTags" name="publishTags" defaultValue={episode.publishTags.join(", ")} />
+        <div className={FIELD_GROUP}>
+          <label htmlFor="publishTags" className={LABEL}>
+            Tag (pisahkan dengan koma)
+          </label>
+          <input
+            id="publishTags"
+            name="publishTags"
+            defaultValue={episode.publishTags.join(", ")}
+            className={INPUT}
+          />
         </div>
-        <button type="submit">Simpan</button>
+        <button type="submit" className={BUTTON_PRIMARY}>
+          Simpan
+        </button>
       </form>
 
-      <p>
-        <Link href={`/episodes/${episodeId}/checklist/publish`}>Checklist Platform Tujuan →</Link>
-      </p>
+      <Link
+        href={`/episodes/${episodeId}/checklist/publish`}
+        className={`${CARD} mt-6 flex items-center justify-between transition-shadow hover:shadow-md`}
+      >
+        <span className="font-medium text-slate-900">Checklist Platform Tujuan</span>
+        <span className="text-slate-400">→</span>
+      </Link>
     </main>
   );
 }

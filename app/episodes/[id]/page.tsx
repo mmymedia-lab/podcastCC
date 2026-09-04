@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { STAGE_LABELS, STAGE_ORDER } from "../stages";
 import { updateEpisodeStageAction, updateRecordingScheduleAction } from "../actions";
+import { StageBadge } from "@/components/ui/StageBadge";
+import { BUTTON_PRIMARY, CARD, FIELD_GROUP, H1, H2, INPUT, LABEL, PAGE_WIDE } from "@/lib/ui-classes";
 
 function toDatetimeLocalValue(date: Date | null): string {
   if (!date) return "";
@@ -27,86 +29,94 @@ export default async function EpisodeDetailPage({
 
   const settings = await getWorkspaceSettings();
 
+  const stageLinks = [
+    { href: "outline", label: "Riset & Outline" },
+    { href: "guest-questions", label: "Pertanyaan Narasumber" },
+    { href: "checklist/pra-produksi", label: "Checklist Pra-Produksi" },
+    { href: "guests", label: "Tamu & Narasumber" },
+    { href: "rundown", label: "Rundown & Mode Eksekusi" },
+    { href: "checklist/pasca-produksi", label: "Checklist Pasca-Produksi" },
+    { href: "timestamps", label: "Timestamp / Chapter" },
+    { href: "show-notes", label: "Show Notes" },
+    { href: "publish", label: "Publish & Distribusi" },
+    { href: "evaluation", label: "Evaluasi" },
+    ...(settings.mode === "TIM" ? [{ href: "roles", label: "Peran Tim" }] : []),
+  ];
+
   return (
-    <main>
-      <h1>{episode.title}</h1>
-      <p>
-        Tahap saat ini: <strong>{STAGE_LABELS[episode.stage]}</strong>
-      </p>
+    <main className={PAGE_WIDE}>
+      <div className="mb-6">
+        <h1 className={`${H1} mb-2`}>{episode.title}</h1>
+        <StageBadge stage={episode.stage} />
+      </div>
 
-      <form action={updateEpisodeStageAction.bind(null, episode.id)}>
-        <label htmlFor="stage">Ubah tahap</label>
-        <select id="stage" name="stage" defaultValue={episode.stage}>
-          {STAGE_ORDER.map((stage) => (
-            <option key={stage} value={stage}>
-              {STAGE_LABELS[stage]}
-            </option>
-          ))}
-        </select>
-        <button type="submit">Simpan</button>
-      </form>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <form action={updateEpisodeStageAction.bind(null, episode.id)} className={CARD}>
+          <label htmlFor="stage" className={LABEL}>
+            Ubah tahap
+          </label>
+          <select
+            id="stage"
+            name="stage"
+            defaultValue={episode.stage}
+            className={`${INPUT} mb-3`}
+          >
+            {STAGE_ORDER.map((stage) => (
+              <option key={stage} value={stage}>
+                {STAGE_LABELS[stage]}
+              </option>
+            ))}
+          </select>
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Simpan
+          </button>
+        </form>
 
-      <h2>Alur Episode</h2>
-      <ol>
+        <form action={updateRecordingScheduleAction.bind(null, episode.id)} className={CARD}>
+          <label htmlFor="recordingScheduledAt" className={LABEL}>
+            Jadwal rekaman
+          </label>
+          <input
+            id="recordingScheduledAt"
+            name="recordingScheduledAt"
+            type="datetime-local"
+            defaultValue={toDatetimeLocalValue(episode.recordingScheduledAt)}
+            className={`${INPUT} mb-3`}
+          />
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Simpan
+          </button>
+        </form>
+      </div>
+
+      <h2 className={H2}>Alur Episode</h2>
+      <ol className="flex flex-wrap gap-2">
         {STAGE_ORDER.map((stage) => (
           <li key={stage}>
-            {STAGE_LABELS[stage]}
-            {stage === episode.stage && " (saat ini)"}
+            {stage === episode.stage ? (
+              <StageBadge stage={stage} />
+            ) : (
+              <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-500">
+                {STAGE_LABELS[stage]}
+              </span>
+            )}
           </li>
         ))}
       </ol>
 
-      <h2>Jadwal Rekaman</h2>
-      <form action={updateRecordingScheduleAction.bind(null, episode.id)}>
-        <label htmlFor="recordingScheduledAt">Tanggal & jam rekaman</label>
-        <input
-          id="recordingScheduledAt"
-          name="recordingScheduledAt"
-          type="datetime-local"
-          defaultValue={toDatetimeLocalValue(episode.recordingScheduledAt)}
-        />
-        <button type="submit">Simpan</button>
-      </form>
-
-      <h2>Detail Tahap</h2>
-      <p>
-        <Link href={`/episodes/${episode.id}/outline`}>Riset & Outline →</Link>
-      </p>
-      <p>
-        <Link href={`/episodes/${episode.id}/guest-questions`}>Pertanyaan Narasumber →</Link>
-      </p>
-      <p>
-        <Link href={`/episodes/${episode.id}/checklist/pra-produksi`}>Checklist Pra-Produksi →</Link>
-      </p>
-      <p>
-        <Link href={`/episodes/${episode.id}/guests`}>Tamu & Narasumber →</Link>
-      </p>
-      <p>
-        <Link href={`/episodes/${episode.id}/show-notes`}>Show Notes →</Link>
-      </p>
-      <p>
-        <Link href={`/episodes/${episode.id}/rundown`}>Rundown & Mode Eksekusi →</Link>
-      </p>
-      <p>
-        <Link href={`/episodes/${episode.id}/checklist/pasca-produksi`}>Checklist Pasca-Produksi →</Link>
-      </p>
-      <p>
-        <Link href={`/episodes/${episode.id}/timestamps`}>Timestamp / Chapter →</Link>
-      </p>
-      <p>
-        <Link href={`/episodes/${episode.id}/publish`}>Publish & Distribusi →</Link>
-      </p>
-      <p>
-        <Link href={`/episodes/${episode.id}/evaluation`}>Evaluasi →</Link>
-      </p>
-      {settings.mode === "TIM" && (
-        <p>
-          <Link href={`/episodes/${episode.id}/roles`}>Peran Tim →</Link>
-        </p>
-      )}
-      <p>
-        <em>Semua tahap PRD sudah tersedia di sini.</em>
-      </p>
+      <h2 className={H2}>Detail Tahap</h2>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {stageLinks.map((link) => (
+          <Link
+            key={link.href}
+            href={`/episodes/${episode.id}/${link.href}`}
+            className={`${CARD} flex items-center justify-between transition-shadow hover:shadow-md`}
+          >
+            <span className="font-medium text-slate-900">{link.label}</span>
+            <span className="text-slate-400">→</span>
+          </Link>
+        ))}
+      </div>
     </main>
   );
 }

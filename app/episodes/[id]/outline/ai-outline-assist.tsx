@@ -1,8 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { BUTTON_PRIMARY } from "@/lib/ui-classes";
 
-export function AiOutlineAssist({ episodeTitle }: { episodeTitle: string }) {
+export function AiOutlineAssist({
+  episodeId,
+  episodeTitle,
+}: {
+  episodeId: string;
+  episodeTitle: string;
+}) {
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -14,7 +21,7 @@ export function AiOutlineAssist({ episodeTitle }: { episodeTitle: string }) {
       const response = await fetch("/api/ai/outline-draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ episodeTitle }),
+        body: JSON.stringify({ episodeId, episodeTitle }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -31,18 +38,26 @@ export function AiOutlineAssist({ episodeTitle }: { episodeTitle: string }) {
   }
 
   return (
-    <div style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem" }}>
-      <h2>Bantuan AI: Draft Outline</h2>
-      <button onClick={requestDraft} disabled={status === "loading"}>
+    <div className="mb-4 rounded-lg border border-primary-100 bg-primary-50 p-4">
+      <h2 className="mb-2 text-sm font-semibold text-primary-800">Bantuan AI: Draft Outline</h2>
+      <button
+        onClick={requestDraft}
+        disabled={status === "loading"}
+        className={BUTTON_PRIMARY}
+      >
         {status === "loading" ? "Membuat draft..." : "Draft dengan AI"}
       </button>
       {status === "error" && (
-        <p role="alert">{errorMessage} — kamu tetap bisa isi poin bicara manual di bawah.</p>
+        <p role="alert" className="mt-2 text-sm text-danger-700">
+          {errorMessage} — kamu tetap bisa isi poin bicara manual di bawah.
+        </p>
       )}
       {draft && (
         <>
-          <p>Salin poin yang relevan ke daftar poin bicara di bawah secara manual:</p>
-          <pre style={{ whiteSpace: "pre-wrap", background: "#f5f5f5", padding: "0.75rem" }}>
+          <p className="mt-3 text-sm text-slate-700">
+            Salin poin yang relevan ke daftar poin bicara di bawah secara manual:
+          </p>
+          <pre className="mt-2 whitespace-pre-wrap rounded-md bg-white p-3 text-sm text-slate-800">
             {draft}
           </pre>
         </>

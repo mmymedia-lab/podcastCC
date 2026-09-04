@@ -7,6 +7,22 @@ import {
   createEvaluationNoteAction,
   deleteEvaluationNoteAction,
 } from "./actions";
+import {
+  BACK_LINK,
+  BUTTON_DANGER,
+  BUTTON_PRIMARY,
+  BUTTON_SECONDARY,
+  CARD,
+  CARD_LIST,
+  EMPTY_STATE,
+  FIELD_GROUP,
+  FORM,
+  H1,
+  H2,
+  LABEL,
+  PAGE,
+  TEXTAREA,
+} from "@/lib/ui-classes";
 
 export default async function EvaluationPage({
   params,
@@ -25,44 +41,50 @@ export default async function EvaluationPage({
   });
 
   return (
-    <main>
-      <p>
-        <Link href={`/episodes/${episodeId}`}>← {episode.title}</Link>
+    <main className={PAGE}>
+      <p className="mb-2">
+        <Link href={`/episodes/${episodeId}`} className={BACK_LINK}>
+          ← {episode.title}
+        </Link>
       </p>
-      <h1>Evaluasi: {episode.title}</h1>
+      <h1 className={H1}>Evaluasi: {episode.title}</h1>
 
-      <ul>
+      <ul className={CARD_LIST}>
         {notes.map((note) => (
-          <li key={note.id}>
-            <p style={{ whiteSpace: "pre-wrap" }}>{note.content}</p>
-            {note.convertedToThemeIdeaAt ? (
-              <span>✓ Sudah dijadikan ide</span>
-            ) : (
-              <form
-                action={convertNoteToThemeIdeaAction.bind(null, episodeId, note.id)}
-                style={{ display: "inline" }}
-              >
-                <button type="submit">Jadikan ide baru</button>
+          <li key={note.id} className={CARD}>
+            <p className="whitespace-pre-wrap text-sm text-slate-900">{note.content}</p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {note.convertedToThemeIdeaAt ? (
+                <span className="text-sm text-primary-700">✓ Sudah dijadikan ide</span>
+              ) : (
+                <form action={convertNoteToThemeIdeaAction.bind(null, episodeId, note.id)}>
+                  <button type="submit" className={BUTTON_SECONDARY}>
+                    Jadikan ide baru
+                  </button>
+                </form>
+              )}
+              <form action={deleteEvaluationNoteAction.bind(null, episodeId, note.id)}>
+                <button type="submit" className={BUTTON_DANGER}>
+                  Hapus
+                </button>
               </form>
-            )}{" "}
-            <form
-              action={deleteEvaluationNoteAction.bind(null, episodeId, note.id)}
-              style={{ display: "inline" }}
-            >
-              <button type="submit">Hapus</button>
-            </form>
+            </div>
           </li>
         ))}
-        {notes.length === 0 && <p>Belum ada catatan evaluasi.</p>}
+        {notes.length === 0 && <p className={EMPTY_STATE}>Belum ada catatan evaluasi.</p>}
       </ul>
 
-      <h2>Tambah Catatan</h2>
-      <form action={createEvaluationNoteAction.bind(null, episodeId)}>
-        <div>
-          <label htmlFor="content">Catatan (apa yang berjalan baik/kurang, ide follow-up, dll.)</label>
-          <textarea id="content" name="content" required />
+      <h2 className={H2}>Tambah Catatan</h2>
+      <form action={createEvaluationNoteAction.bind(null, episodeId)} className={FORM}>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="content" className={LABEL}>
+            Catatan (apa yang berjalan baik/kurang, ide follow-up, dll.)
+          </label>
+          <textarea id="content" name="content" required className={TEXTAREA} />
         </div>
-        <button type="submit">Tambah</button>
+        <button type="submit" className={BUTTON_PRIMARY}>
+          Tambah
+        </button>
       </form>
     </main>
   );

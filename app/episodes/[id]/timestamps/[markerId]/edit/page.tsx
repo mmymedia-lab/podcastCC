@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { updateTimestampMarkerAction } from "../../actions";
+import { BUTTON_PRIMARY, FIELD_GROUP, FORM, H1, INPUT, LABEL, PAGE } from "@/lib/ui-classes";
 
 export default async function EditTimestampMarkerPage({
   params,
@@ -15,18 +16,30 @@ export default async function EditTimestampMarkerPage({
   if (!marker || marker.episodeId !== episodeId) notFound();
 
   return (
-    <main>
-      <h1>Edit Timestamp</h1>
-      <form action={updateTimestampMarkerAction.bind(null, episodeId, marker.id)}>
-        <div>
-          <label htmlFor="timeLabel">Waktu</label>
-          <input id="timeLabel" name="timeLabel" defaultValue={marker.timeLabel} required />
+    <main className={PAGE}>
+      <h1 className={H1}>Edit Timestamp</h1>
+      <form action={updateTimestampMarkerAction.bind(null, episodeId, marker.id)} className={FORM}>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="timeLabel" className={LABEL}>
+            Waktu
+          </label>
+          <input
+            id="timeLabel"
+            name="timeLabel"
+            defaultValue={marker.timeLabel}
+            required
+            className={INPUT}
+          />
         </div>
-        <div>
-          <label htmlFor="label">Label chapter</label>
-          <input id="label" name="label" defaultValue={marker.label} required />
+        <div className={FIELD_GROUP}>
+          <label htmlFor="label" className={LABEL}>
+            Label chapter
+          </label>
+          <input id="label" name="label" defaultValue={marker.label} required className={INPUT} />
         </div>
-        <button type="submit">Simpan</button>
+        <button type="submit" className={BUTTON_PRIMARY}>
+          Simpan
+        </button>
       </form>
     </main>
   );

@@ -68,56 +68,59 @@ export function ExecuteClient({
     }
   }
 
+  const navButtonClass =
+    "rounded-lg border border-slate-700 px-6 py-3 text-lg text-slate-200 transition-colors " +
+    "hover:border-slate-500 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-30";
+
   if (!activeSegment) {
     return (
-      <main
-        style={{ minHeight: "100vh", background: "#0b0b0b", color: "#f5f5f5", padding: "3rem 2rem" }}
-      >
-        <h1>{episodeTitle}</h1>
-        <p>Belum ada segmen rundown. Tambahkan dulu di halaman Rundown episode ini.</p>
+      <main className="min-h-screen bg-slate-950 px-8 py-12 text-slate-50 md:px-16 md:py-16">
+        <h1 className="text-2xl font-semibold">{episodeTitle}</h1>
+        <p className="mt-2 text-slate-400">
+          Belum ada segmen rundown. Tambahkan dulu di halaman Rundown episode ini.
+        </p>
       </main>
     );
   }
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#0b0b0b",
-        color: "#f5f5f5",
-        padding: "3rem 2rem",
-        fontSize: "1.25rem",
-        lineHeight: 1.6,
-      }}
-    >
-      <p style={{ fontSize: "1rem", opacity: 0.6, marginBottom: 0 }}>{episodeTitle}</p>
-      <p style={{ fontSize: "1rem", opacity: 0.6, marginTop: "0.25rem" }}>
+    <main className="min-h-screen bg-slate-950 px-8 py-12 text-lg leading-relaxed text-slate-50 md:px-16 md:py-16">
+      <p className="mb-0 text-base text-slate-500">{episodeTitle}</p>
+      <p className="mt-1 text-base text-slate-500">
         Segmen {activeIndex + 1} dari {segments.length} · Estimasi {activeSegment.estimatedMinutes} menit
       </p>
 
-      <h1 style={{ fontSize: "2rem", margin: "0 0 1rem" }}>{activeSegment.title}</h1>
+      <h1 className="my-4 text-3xl font-bold text-slate-50 md:text-4xl">{activeSegment.title}</h1>
 
-      <p style={{ fontSize: "3.5rem", fontFamily: "monospace", margin: "1rem 0" }}>
+      <p className="my-4 font-mono text-6xl font-semibold tabular-nums text-emerald-400 md:text-7xl">
         {formatElapsed(elapsedMs)}
       </p>
 
-      <p style={{ whiteSpace: "pre-wrap", marginBottom: "2rem" }}>{activeSegment.talkingPoints}</p>
+      <p className="mb-8 max-w-3xl whitespace-pre-wrap text-xl text-slate-100 md:text-2xl">
+        {activeSegment.talkingPoints}
+      </p>
 
-      <div style={{ marginBottom: "2.5rem" }}>
-        <button onClick={() => goToSegment(activeIndex - 1)} disabled={activeIndex === 0}>
+      <div className="mb-10 flex flex-wrap gap-3">
+        <button
+          onClick={() => goToSegment(activeIndex - 1)}
+          disabled={activeIndex === 0}
+          className={navButtonClass}
+        >
           ← Segmen Sebelumnya
-        </button>{" "}
+        </button>
         <button
           onClick={() => goToSegment(activeIndex + 1)}
           disabled={activeIndex === segments.length - 1}
+          className={navButtonClass}
         >
           Segmen Berikutnya →
         </button>
       </div>
 
-      <div>
-        <label htmlFor="sessionNote">Catatan singkat untuk segmen ini</label>
-        <br />
+      <div className="max-w-xl">
+        <label htmlFor="sessionNote" className="mb-1 block text-sm text-slate-400">
+          Catatan singkat untuk segmen ini
+        </label>
         <textarea
           id="sessionNote"
           value={noteDraft}
@@ -126,13 +129,18 @@ export function ExecuteClient({
             setNoteStatus("idle");
           }}
           rows={3}
-          style={{ width: "100%", maxWidth: "40rem" }}
+          className="w-full rounded-md border border-slate-700 bg-slate-900 p-3 text-base text-slate-100 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
         />
-        <br />
-        <button onClick={saveNote} disabled={noteStatus === "saving"}>
-          {noteStatus === "saving" ? "Menyimpan..." : "Simpan Catatan"}
-        </button>
-        {noteStatus === "saved" && <span> Tersimpan.</span>}
+        <div className="mt-2 flex items-center gap-3">
+          <button
+            onClick={saveNote}
+            disabled={noteStatus === "saving"}
+            className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {noteStatus === "saving" ? "Menyimpan..." : "Simpan Catatan"}
+          </button>
+          {noteStatus === "saved" && <span className="text-sm text-emerald-400">Tersimpan.</span>}
+        </div>
       </div>
     </main>
   );

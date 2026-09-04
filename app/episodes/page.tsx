@@ -3,6 +3,8 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { EpisodeStage } from "@prisma/client";
 import { STAGE_LABELS, STAGE_ORDER } from "./stages";
+import { StageBadge } from "@/components/ui/StageBadge";
+import { CARD, CARD_LIST, EMPTY_STATE, H1, PAGE } from "@/lib/ui-classes";
 
 export default async function EpisodesPage({
   searchParams,
@@ -20,26 +22,46 @@ export default async function EpisodesPage({
   });
 
   return (
-    <main>
-      <h1>Episode</h1>
+    <main className={PAGE}>
+      <h1 className={H1}>Episode</h1>
 
-      <nav aria-label="Filter tahap">
-        <Link href="/episodes">Semua</Link>
+      <nav aria-label="Filter tahap" className="mb-4 flex flex-wrap gap-2">
+        <Link
+          href="/episodes"
+          className={`rounded-full px-3 py-1 text-xs font-medium ${
+            !activeStage ? "bg-primary-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          Semua
+        </Link>
         {STAGE_ORDER.map((stage) => (
-          <Link key={stage} href={`/episodes?stage=${stage}`}>
-            {" "}
+          <Link
+            key={stage}
+            href={`/episodes?stage=${stage}`}
+            className={`rounded-full px-3 py-1 text-xs font-medium ${
+              activeStage === stage
+                ? "bg-primary-700 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
+          >
             {STAGE_LABELS[stage]}
           </Link>
         ))}
       </nav>
 
-      <ul>
+      <ul className={CARD_LIST}>
         {episodes.map((episode) => (
           <li key={episode.id}>
-            <Link href={`/episodes/${episode.id}`}>{episode.title}</Link> — {STAGE_LABELS[episode.stage]}
+            <Link
+              href={`/episodes/${episode.id}`}
+              className={`${CARD} flex items-center justify-between transition-shadow hover:shadow-md`}
+            >
+              <span className="font-medium text-slate-900">{episode.title}</span>
+              <StageBadge stage={episode.stage} />
+            </Link>
           </li>
         ))}
-        {episodes.length === 0 && <p>Belum ada episode.</p>}
+        {episodes.length === 0 && <p className={EMPTY_STATE}>Belum ada episode.</p>}
       </ul>
     </main>
   );
