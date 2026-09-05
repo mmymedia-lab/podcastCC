@@ -34,6 +34,21 @@
   --color-stage-evaluasi: #e11d48;
   --color-stage-evaluasi-bg: #fff1f2;
 
+  /*
+   * Phase colors — 3 broad groups over the 7 stages above, so a glance at
+   * any stage badge tells you which phase of production it's in without
+   * memorizing all 7 individual stage colors: blue = still prepping, green
+   * = live/recording day, red = everything after recording wraps. See
+   * app/episodes/phases.ts for the stage->phase mapping. Reuses the
+   * riset-outline/panduan-eksekusi/evaluasi hues above for continuity.
+   */
+  --color-phase-pra-produksi: #2563eb;
+  --color-phase-pra-produksi-bg: #eff6ff;
+  --color-phase-produksi-live: #059669;
+  --color-phase-produksi-live-bg: #ecfdf5;
+  --color-phase-pasca-produksi: #e11d48;
+  --color-phase-pasca-produksi-bg: #fff1f2;
+
   --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 

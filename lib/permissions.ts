@@ -5,20 +5,22 @@ import { requireSession, resolveUserId } from "./session";
 // Which roles may edit each stage. This mapping is this project's own
 // decision (PRD.md flagged issue #16 as needing one — not fully specified
 // there), not something extracted from the PRD:
-// - PRODUCER can edit every stage (acts as the episode's admin)
-// - HOST covers the stages they actually run day-to-day: outline prep,
-//   pre-production logistics, and the live execution/rundown
-// - EDITOR covers post-production and publish
+// - LEADER_PRODUKSI can edit every stage (acts as the episode's admin)
+// - TIM_BRAINSTORMING covers ideation and outline prep — the stages before
+//   there's anything to record
+// - TIM_LIVE covers pre-production logistics and the live execution/rundown
+// - TIM_EVALUASI covers everything after recording wraps: post-production,
+//   publish, and evaluation
 // - Everyone can still VIEW every stage read-only regardless of role,
 //   per PRD.md User Story 26 — this helper only gates editing.
 const STAGE_ROLE_ACCESS: Record<EpisodeStage, EpisodeRoleType[]> = {
-  BANK_TEMA: ["PRODUCER", "HOST"],
-  RISET_OUTLINE: ["PRODUCER", "HOST"],
-  PRA_PRODUKSI: ["PRODUCER", "HOST"],
-  PANDUAN_EKSEKUSI: ["PRODUCER", "HOST"],
-  PASCA_PRODUKSI: ["PRODUCER", "EDITOR"],
-  PUBLISH_DISTRIBUSI: ["PRODUCER", "EDITOR"],
-  EVALUASI: ["PRODUCER", "HOST", "EDITOR"],
+  BANK_TEMA: ["LEADER_PRODUKSI", "TIM_BRAINSTORMING"],
+  RISET_OUTLINE: ["LEADER_PRODUKSI", "TIM_BRAINSTORMING"],
+  PRA_PRODUKSI: ["LEADER_PRODUKSI", "TIM_LIVE"],
+  PANDUAN_EKSEKUSI: ["LEADER_PRODUKSI", "TIM_LIVE"],
+  PASCA_PRODUKSI: ["LEADER_PRODUKSI", "TIM_EVALUASI"],
+  PUBLISH_DISTRIBUSI: ["LEADER_PRODUKSI", "TIM_EVALUASI"],
+  EVALUASI: ["LEADER_PRODUKSI", "TIM_EVALUASI"],
 };
 
 /**

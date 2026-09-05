@@ -4,9 +4,11 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { STAGE_LABELS, STAGE_ORDER } from "../stages";
+import { PHASE_BADGE_STYLE, STAGE_TO_PHASE } from "../phases";
 import { updateEpisodeStageAction, updateRecordingScheduleAction } from "../actions";
 import { StageBadge } from "@/components/ui/StageBadge";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { PhaseLegend } from "@/components/ui/PhaseLegend";
 import { BUTTON_PRIMARY, CARD, FIELD_GROUP, H1, H2, INPUT, LABEL, PAGE_WIDE } from "@/lib/ui-classes";
 
 function toDatetimeLocalValue(date: Date | null): string {
@@ -101,16 +103,17 @@ export default async function EpisodeDetailPage({
       <ol className="flex flex-wrap gap-2">
         {STAGE_ORDER.map((stage) => (
           <li key={stage}>
-            {stage === episode.stage ? (
-              <StageBadge stage={stage} />
-            ) : (
-              <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-500">
-                {STAGE_LABELS[stage]}
-              </span>
-            )}
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${PHASE_BADGE_STYLE[STAGE_TO_PHASE[stage]]} ${
+                stage === episode.stage ? "ring-2 ring-offset-1 ring-slate-400" : "opacity-60"
+              }`}
+            >
+              {STAGE_LABELS[stage]}
+            </span>
           </li>
         ))}
       </ol>
+      <PhaseLegend />
 
       <h2 className={H2}>Detail Tahap</h2>
       <div className="grid gap-3 sm:grid-cols-2">

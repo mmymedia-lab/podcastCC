@@ -20,9 +20,10 @@ import {
 } from "@/lib/ui-classes";
 
 const ROLE_LABELS = {
-  PRODUCER: "Producer",
-  HOST: "Host",
-  EDITOR: "Editor",
+  LEADER_PRODUKSI: "Leader Produksi",
+  TIM_BRAINSTORMING: "Tim Brainstorming",
+  TIM_LIVE: "Tim Live",
+  TIM_EVALUASI: "Tim Evaluasi",
 } as const;
 
 export default async function EpisodeRolesPage({
@@ -104,9 +105,10 @@ export default async function EpisodeRolesPage({
             Peran
           </label>
           <select id="role" name="role" required className={INPUT}>
-            <option value="PRODUCER">Producer</option>
-            <option value="HOST">Host</option>
-            <option value="EDITOR">Editor</option>
+            <option value="LEADER_PRODUKSI">Leader Produksi</option>
+            <option value="TIM_BRAINSTORMING">Tim Brainstorming</option>
+            <option value="TIM_LIVE">Tim Live</option>
+            <option value="TIM_EVALUASI">Tim Evaluasi</option>
           </select>
         </div>
         <button type="submit" className={BUTTON_PRIMARY}>

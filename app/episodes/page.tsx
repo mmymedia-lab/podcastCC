@@ -5,6 +5,7 @@ import { EpisodeStage } from "@prisma/client";
 import { STAGE_LABELS, STAGE_ORDER } from "./stages";
 import { StageBadge } from "@/components/ui/StageBadge";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { PhaseLegend } from "@/components/ui/PhaseLegend";
 import { CARD, CARD_LIST, EMPTY_STATE, H1, PAGE } from "@/lib/ui-classes";
 
 export default async function EpisodesPage({
@@ -65,6 +66,7 @@ export default async function EpisodesPage({
         ))}
         {episodes.length === 0 && <p className={EMPTY_STATE}>Belum ada episode.</p>}
       </ul>
+      <PhaseLegend />
     </main>
   );
 }

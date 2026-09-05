@@ -42,7 +42,7 @@ describe("canEditStage", () => {
   it("denies a user with no role on the episode once roles are configured", async () => {
     workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
     episodeRole.findMany.mockResolvedValue([
-      { episodeId: "ep-1", userId: "other-user", role: "PRODUCER" },
+      { episodeId: "ep-1", userId: "other-user", role: "LEADER_PRODUKSI" },
     ]);
 
     expect(await canEditStage("user-1", "ep-1", "RISET_OUTLINE")).toBe(false);
@@ -51,26 +51,26 @@ describe("canEditStage", () => {
   it("denies a role that isn't allowed to edit the given stage", async () => {
     workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
     episodeRole.findMany.mockResolvedValue([
-      { episodeId: "ep-1", userId: "user-1", role: "EDITOR" },
+      { episodeId: "ep-1", userId: "user-1", role: "TIM_EVALUASI" },
     ]);
 
-    // EDITOR can't edit RISET_OUTLINE per STAGE_ROLE_ACCESS.
+    // TIM_EVALUASI can't edit RISET_OUTLINE per STAGE_ROLE_ACCESS.
     expect(await canEditStage("user-1", "ep-1", "RISET_OUTLINE")).toBe(false);
   });
 
   it("allows a role that is allowed to edit the given stage", async () => {
     workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
     episodeRole.findMany.mockResolvedValue([
-      { episodeId: "ep-1", userId: "user-1", role: "EDITOR" },
+      { episodeId: "ep-1", userId: "user-1", role: "TIM_EVALUASI" },
     ]);
 
     expect(await canEditStage("user-1", "ep-1", "PASCA_PRODUKSI")).toBe(true);
   });
 
-  it("always allows PRODUCER regardless of stage", async () => {
+  it("always allows LEADER_PRODUKSI regardless of stage", async () => {
     workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
     episodeRole.findMany.mockResolvedValue([
-      { episodeId: "ep-1", userId: "user-1", role: "PRODUCER" },
+      { episodeId: "ep-1", userId: "user-1", role: "LEADER_PRODUKSI" },
     ]);
 
     for (const stage of [
