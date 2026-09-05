@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EpisodeStage } from "@prisma/client";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { STAGE_LABELS, STAGE_ORDER } from "../stages";
-import { PHASE_BADGE_STYLE, STAGE_TO_PHASE } from "../phases";
+import { PHASE_BADGE_STYLE, PHASE_BORDER_STYLE, STAGE_TO_PHASE } from "../phases";
 import { updateEpisodeStageAction, updateRecordingScheduleAction } from "../actions";
 import { StageBadge } from "@/components/ui/StageBadge";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
@@ -32,17 +33,21 @@ export default async function EpisodeDetailPage({
 
   const settings = await getWorkspaceSettings();
 
-  const stageLinks = [
-    { href: "outline", label: "Riset & Outline" },
-    { href: "guest-questions", label: "Pertanyaan Narasumber" },
-    { href: "checklist/pra-produksi", label: "Checklist Pra-Produksi" },
-    { href: "guests", label: "Tamu & Narasumber" },
-    { href: "rundown", label: "Rundown & Mode Eksekusi" },
-    { href: "checklist/pasca-produksi", label: "Checklist Pasca-Produksi" },
-    { href: "timestamps", label: "Timestamp / Chapter" },
-    { href: "show-notes", label: "Show Notes" },
-    { href: "publish", label: "Publish & Distribusi" },
-    { href: "evaluation", label: "Evaluasi" },
+  // `stage` here is whichever stage each sub-page's own edit actions gate
+  // on (see requireEditableStage()/canEditStage() calls in each section's
+  // actions.ts) — that's what its card's phase color reflects. "Peran Tim"
+  // has no stage: it's team management, not a production step.
+  const stageLinks: { href: string; label: string; stage?: EpisodeStage }[] = [
+    { href: "outline", label: "Riset & Outline", stage: "RISET_OUTLINE" },
+    { href: "guest-questions", label: "Pertanyaan Narasumber", stage: "RISET_OUTLINE" },
+    { href: "checklist/pra-produksi", label: "Checklist Pra-Produksi", stage: "PRA_PRODUKSI" },
+    { href: "guests", label: "Tamu & Narasumber", stage: "PRA_PRODUKSI" },
+    { href: "rundown", label: "Rundown & Mode Eksekusi", stage: "PANDUAN_EKSEKUSI" },
+    { href: "checklist/pasca-produksi", label: "Checklist Pasca-Produksi", stage: "PASCA_PRODUKSI" },
+    { href: "timestamps", label: "Timestamp / Chapter", stage: "PASCA_PRODUKSI" },
+    { href: "show-notes", label: "Show Notes", stage: "PASCA_PRODUKSI" },
+    { href: "publish", label: "Publish & Distribusi", stage: "PUBLISH_DISTRIBUSI" },
+    { href: "evaluation", label: "Evaluasi", stage: "EVALUASI" },
     ...(settings.mode === "TIM" ? [{ href: "roles", label: "Peran Tim" }] : []),
   ];
 
@@ -113,7 +118,6 @@ export default async function EpisodeDetailPage({
           </li>
         ))}
       </ol>
-      <PhaseLegend />
 
       <h2 className={H2}>Detail Tahap</h2>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -121,13 +125,25 @@ export default async function EpisodeDetailPage({
           <Link
             key={link.href}
             href={`/episodes/${episode.id}/${link.href}`}
-            className={`${CARD} flex items-center justify-between transition-shadow hover:shadow-md`}
+            // Not built on the shared CARD constant: CARD's own
+            // `border-slate-200` is a border-color utility of equal
+            // specificity to the phase border-color utility below, and
+            // (being unrelated to source order in this class list) it
+            // sorts later in the generated stylesheet and silently wins —
+            // so the accent color never actually rendered when combined
+            // with CARD. Rebuilding the same visual recipe without that
+            // conflicting class, matching how the Kanban cards (which
+            // don't hit this conflict) already do it correctly.
+            className={`flex items-center justify-between rounded-lg border-l-4 bg-white p-4 shadow-sm transition-shadow hover:shadow-md ${
+              link.stage ? PHASE_BORDER_STYLE[STAGE_TO_PHASE[link.stage]] : "border-l-slate-200"
+            }`}
           >
             <span className="font-medium text-slate-900">{link.label}</span>
             <span className="text-slate-400">→</span>
           </Link>
         ))}
       </div>
+      <PhaseLegend />
     </main>
   );
 }
