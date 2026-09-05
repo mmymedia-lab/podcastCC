@@ -54,8 +54,13 @@ export default async function RundownPage({
       />
       <div className="mb-6 flex items-center justify-between">
         <h1 className={`${H1} mb-0`}>Rundown: {episode.title}</h1>
-        <Link href={`/episodes/${episodeId}/execute`} className={BUTTON_PRIMARY}>
-          ▶ Buka Mode Eksekusi
+        <Link
+          href={`/episodes/${episodeId}/execute`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={BUTTON_PRIMARY}
+        >
+          ▶ Buka Mode Eksekusi (tab baru)
         </Link>
       </div>
 
