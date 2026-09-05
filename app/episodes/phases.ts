@@ -32,3 +32,10 @@ export const PHASE_BADGE_STYLE: Record<EpisodePhase, string> = {
   PRODUKSI_LIVE: "text-phase-produksi-live bg-phase-produksi-live-bg",
   PASCA_PRODUKSI: "text-phase-pasca-produksi bg-phase-pasca-produksi-bg",
 };
+
+/** Left-border accent color for cards/links grouped by phase (e.g. Kanban cards, Detail Tahap). */
+export const PHASE_BORDER_STYLE: Record<EpisodePhase, string> = {
+  PRA_PRODUKSI: "border-phase-pra-produksi",
+  PRODUKSI_LIVE: "border-phase-produksi-live",
+  PASCA_PRODUKSI: "border-phase-pasca-produksi",
+};
