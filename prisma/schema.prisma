@@ -192,14 +192,18 @@ model RundownSegment {
   updatedAt        DateTime @updatedAt
 }
 
+// Restructured from the original {PRODUCER, HOST, EDITOR} to mirror the
+// actual production hierarchy: an overall lead plus one role per phase of
+// the workflow (ideation, live recording, post/evaluation).
 enum EpisodeRoleType {
-  PRODUCER
-  HOST
-  EDITOR
+  LEADER_PRODUKSI
+  TIM_BRAINSTORMING
+  TIM_LIVE
+  TIM_EVALUASI
 }
 
 // Only meaningful in Tim mode (see WorkspaceSettings). A user can hold more
-// than one role on the same episode (e.g. Producer AND Host).
+// than one role on the same episode (e.g. Leader Produksi AND Tim Live).
 model EpisodeRole {
   id        String          @id @default(cuid())
   episodeId String
