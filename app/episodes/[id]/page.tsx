@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { STAGE_LABELS, STAGE_ORDER } from "../stages";
 import { PHASE_BADGE_STYLE, PHASE_BORDER_STYLE, STAGE_TO_PHASE } from "../phases";
-import { updateEpisodeStageAction, updateRecordingScheduleAction } from "../actions";
+import { updateEpisodeHostAction, updateEpisodeStageAction, updateRecordingScheduleAction } from "../actions";
 import { StageBadge } from "@/components/ui/StageBadge";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { PhaseLegend } from "@/components/ui/PhaseLegend";
@@ -32,6 +32,7 @@ export default async function EpisodeDetailPage({
   if (!episode) notFound();
 
   const settings = await getWorkspaceSettings();
+  const hosts = await prisma.host.findMany({ orderBy: { name: "asc" } });
 
   // `stage` here is whichever stage each sub-page's own edit actions gate
   // on (see requireEditableStage()/canEditStage() calls in each section's
@@ -98,6 +99,23 @@ export default async function EpisodeDetailPage({
             defaultValue={toDatetimeLocalValue(episode.recordingScheduledAt)}
             className={`${INPUT} mb-3`}
           />
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Simpan
+          </button>
+        </form>
+
+        <form action={updateEpisodeHostAction.bind(null, episode.id)} className={CARD}>
+          <label htmlFor="hostId" className={LABEL}>
+            Host episode ini
+          </label>
+          <select id="hostId" name="hostId" defaultValue={episode.hostId ?? ""} className={`${INPUT} mb-3`}>
+            <option value="">Belum ditentukan</option>
+            {hosts.map((host) => (
+              <option key={host.id} value={host.id}>
+                {host.name}
+              </option>
+            ))}
+          </select>
           <button type="submit" className={BUTTON_PRIMARY}>
             Simpan
           </button>

@@ -26,5 +26,18 @@ export default async function ExecutePage({
     },
   });
 
-  return <ExecuteClient episodeId={episodeId} episodeTitle={episode.title} segments={segments} />;
+  const guestQuestions = await prisma.guestQuestion.findMany({
+    where: { episodeId },
+    orderBy: { order: "asc" },
+    select: { id: true, content: true },
+  });
+
+  return (
+    <ExecuteClient
+      episodeId={episodeId}
+      episodeTitle={episode.title}
+      segments={segments}
+      guestQuestions={guestQuestions}
+    />
+  );
 }

@@ -30,6 +30,26 @@ export async function deleteEvaluationNoteAction(episodeId: string, noteId: stri
   revalidatePath(`/episodes/${episodeId}/evaluation`);
 }
 
+export async function createHostEvaluationAction(episodeId: string, hostId: string, formData: FormData) {
+  await requireEditableStage(episodeId, "EVALUASI");
+
+  await prisma.hostEvaluation.create({
+    data: {
+      episodeId,
+      hostId,
+      content: requireContent(formData.get("content")),
+    },
+  });
+
+  revalidatePath(`/episodes/${episodeId}/evaluation`);
+}
+
+export async function deleteHostEvaluationAction(episodeId: string, evaluationId: string) {
+  await requireEditableStage(episodeId, "EVALUASI");
+  await prisma.hostEvaluation.delete({ where: { id: evaluationId } });
+  revalidatePath(`/episodes/${episodeId}/evaluation`);
+}
+
 /**
  * Turns a follow-up note into a new Bank Tema idea, per PRD.md User Story 24.
  * Idempotent: a note that was already converted is left alone, so double

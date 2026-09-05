@@ -11,6 +11,11 @@ type Segment = {
   sessionNote: string | null;
 };
 
+type GuestQuestion = {
+  id: string;
+  content: string;
+};
+
 // Exported so it can be covered by a unit test (see formatElapsed.test.ts).
 export function formatElapsed(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
@@ -19,20 +24,23 @@ export function formatElapsed(ms: number): string {
   return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
-const EXIT_LINK_CLASS =
-  "fixed right-4 top-4 z-10 rounded-lg border border-slate-700 bg-slate-900/80 px-4 py-2 text-sm text-slate-300 " +
+const CORNER_BUTTON_CLASS =
+  "rounded-lg border border-slate-700 bg-slate-900/80 px-4 py-2 text-sm text-slate-300 " +
   "backdrop-blur transition-colors hover:border-slate-500 hover:bg-slate-800 hover:text-slate-50";
 
 export function ExecuteClient({
   episodeId,
   episodeTitle,
   segments,
+  guestQuestions,
 }: {
   episodeId: string;
   episodeTitle: string;
   segments: Segment[];
+  guestQuestions: GuestQuestion[];
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   // Timestamp-based: elapsed is always (now - segmentStartedAt), recomputed
   // every tick from real wall-clock time. If the tab is backgrounded and
   // the interval is throttled/paused, the next tick still lands on the
@@ -42,6 +50,9 @@ export function ExecuteClient({
   const [elapsedMs, setElapsedMs] = useState(0);
   const [noteDraft, setNoteDraft] = useState(segments[0]?.sessionNote ?? "");
   const [noteStatus, setNoteStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [showQuestions, setShowQuestions] = useState(false);
+  const [tvPairing, setTvPairing] = useState<{ code: string; url: string } | null>(null);
+  const [tvPairingStatus, setTvPairingStatus] = useState<"idle" | "loading" | "error">("idle");
 
   const activeSegment = segments[activeIndex];
 
@@ -51,6 +62,53 @@ export function ExecuteClient({
     const interval = setInterval(tick, 250);
     return () => clearInterval(interval);
   }, [segmentStartedAt]);
+
+  useEffect(() => {
+    const onFullscreenChange = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  // Persists the active segment server-side so a paired TV/tablet/phone
+  // display (see showOnTv below) can poll and stay in sync — Mode
+  // Eksekusi otherwise only tracks this in local React state.
+  useEffect(() => {
+    if (!activeSegment) return;
+    fetch(`/api/rundown-segments/${activeSegment.id}/activate`, { method: "PATCH" }).catch(() => {});
+  }, [activeSegment?.id]);
+
+  async function showOnTv() {
+    setTvPairingStatus("loading");
+    try {
+      const response = await fetch("/api/tv/pairing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ episodeId }),
+      });
+      if (!response.ok) {
+        setTvPairingStatus("error");
+        return;
+      }
+      const json = (await response.json()) as { code: string };
+      setTvPairing({ code: json.code, url: `${window.location.origin}/tv/${json.code}` });
+      setTvPairingStatus("idle");
+    } catch {
+      setTvPairingStatus("error");
+    }
+  }
+
+  async function toggleFullscreen() {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch {
+      // Some browsers/TVs refuse fullscreen outside a direct user gesture or
+      // don't support the API at all — the page still works fine without it.
+    }
+  }
 
   function goToSegment(index: number) {
     if (index < 0 || index >= segments.length) return;
@@ -79,12 +137,44 @@ export function ExecuteClient({
     "rounded-lg border border-slate-700 px-6 py-3 text-lg text-slate-200 transition-colors " +
     "hover:border-slate-500 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-30";
 
+  const cornerButtons = (
+    <div className="fixed right-4 top-4 z-10 flex flex-wrap justify-end gap-2">
+      <button onClick={showOnTv} disabled={tvPairingStatus === "loading"} className={CORNER_BUTTON_CLASS}>
+        {tvPairingStatus === "loading" ? "Menyiapkan..." : "📺 Tampilkan di TV"}
+      </button>
+      <button onClick={toggleFullscreen} className={CORNER_BUTTON_CLASS}>
+        {isFullscreen ? "⛶ Keluar Fullscreen" : "⛶ Fullscreen"}
+      </button>
+      <Link href={`/episodes/${episodeId}/rundown`} className={CORNER_BUTTON_CLASS}>
+        ✕ Keluar
+      </Link>
+    </div>
+  );
+
+  const tvPairingModal = tvPairing && (
+    <div className="fixed inset-0 z-20 flex items-center justify-center bg-slate-950/90 p-6">
+      <div className="max-w-md rounded-xl border border-slate-700 bg-slate-900 p-8 text-center">
+        <p className="text-sm text-slate-400">Kode untuk TV / tablet / HP lain</p>
+        <p className="my-4 font-mono text-6xl font-bold tracking-widest text-emerald-400">{tvPairing.code}</p>
+        <p className="break-all text-sm text-slate-400">
+          Buka <span className="text-slate-200">{tvPairing.url}</span> di perangkat lain, atau masukkan
+          kodenya di app companion.
+        </p>
+        <button
+          onClick={() => setTvPairing(null)}
+          className="mt-6 rounded-md bg-slate-700 px-4 py-2 text-sm text-slate-100 hover:bg-slate-600"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+  );
+
   if (!activeSegment) {
     return (
       <main className="min-h-screen bg-slate-950 px-8 py-12 text-slate-50 md:px-16 md:py-16">
-        <Link href={`/episodes/${episodeId}/rundown`} className={EXIT_LINK_CLASS}>
-          ✕ Keluar
-        </Link>
+        {cornerButtons}
+        {tvPairingModal}
         <h1 className="text-2xl font-semibold">{episodeTitle}</h1>
         <p className="mt-2 text-slate-400">
           Belum ada segmen rundown. Tambahkan dulu di halaman Rundown episode ini.
@@ -95,9 +185,8 @@ export function ExecuteClient({
 
   return (
     <main className="min-h-screen bg-slate-950 px-8 py-12 text-lg leading-relaxed text-slate-50 md:px-16 md:py-16">
-      <Link href={`/episodes/${episodeId}/rundown`} className={EXIT_LINK_CLASS}>
-        ✕ Keluar
-      </Link>
+      {cornerButtons}
+      {tvPairingModal}
       <p className="mb-0 text-base text-slate-500">{episodeTitle}</p>
       <p className="mt-1 text-base text-slate-500">
         Segmen {activeIndex + 1} dari {segments.length} · Estimasi {activeSegment.estimatedMinutes} menit
@@ -129,6 +218,26 @@ export function ExecuteClient({
           Segmen Berikutnya →
         </button>
       </div>
+
+      {guestQuestions.length > 0 && (
+        <div className="mb-10 max-w-2xl">
+          <button
+            onClick={() => setShowQuestions((value) => !value)}
+            className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-slate-500 hover:bg-slate-800"
+          >
+            {showQuestions ? "▲ Sembunyikan Pertanyaan Narasumber" : "▼ Pertanyaan Narasumber"}
+          </button>
+          {showQuestions && (
+            <ol className="mt-3 list-decimal space-y-2 pl-6 text-base text-slate-200">
+              {guestQuestions.map((question) => (
+                <li key={question.id} className="whitespace-pre-wrap">
+                  {question.content}
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}
 
       <div className="max-w-xl">
         <label htmlFor="sessionNote" className="mb-1 block text-sm text-slate-400">
