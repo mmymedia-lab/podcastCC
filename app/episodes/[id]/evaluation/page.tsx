@@ -1,10 +1,13 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import {
   convertNoteToThemeIdeaAction,
   createEvaluationNoteAction,
+  createHostEvaluationAction,
   deleteEvaluationNoteAction,
+  deleteHostEvaluationAction,
 } from "./actions";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
@@ -31,13 +34,20 @@ export default async function EvaluationPage({
   await requireSession();
   const { id: episodeId } = await params;
 
-  const episode = await prisma.episode.findUnique({ where: { id: episodeId } });
+  const episode = await prisma.episode.findUnique({ where: { id: episodeId }, include: { host: true } });
   if (!episode) notFound();
 
   const notes = await prisma.evaluationNote.findMany({
     where: { episodeId },
     orderBy: { createdAt: "desc" },
   });
+
+  const hostEvaluations = episode.hostId
+    ? await prisma.hostEvaluation.findMany({
+        where: { episodeId, hostId: episode.hostId },
+        orderBy: { createdAt: "desc" },
+      })
+    : [];
 
   return (
     <main className={PAGE}>
@@ -88,6 +98,56 @@ export default async function EvaluationPage({
           Tambah
         </button>
       </form>
+
+      <h2 className={H2}>Evaluasi Host</h2>
+      {episode.host ? (
+        <>
+          <p className="mb-3 text-sm text-slate-600">
+            Host episode ini: <strong className="text-slate-900">{episode.host.name}</strong>
+          </p>
+          <ul className={CARD_LIST}>
+            {hostEvaluations.map((evaluation) => (
+              <li key={evaluation.id} className={CARD}>
+                <p className="whitespace-pre-wrap text-sm text-slate-900">{evaluation.content}</p>
+                <form
+                  action={deleteHostEvaluationAction.bind(null, episodeId, evaluation.id)}
+                  className="mt-3"
+                >
+                  <button type="submit" className={BUTTON_DANGER}>
+                    Hapus
+                  </button>
+                </form>
+              </li>
+            ))}
+            {hostEvaluations.length === 0 && (
+              <p className={EMPTY_STATE}>Belum ada catatan evaluasi host.</p>
+            )}
+          </ul>
+
+          <form
+            action={createHostEvaluationAction.bind(null, episodeId, episode.host.id)}
+            className={`${FORM} mt-4`}
+          >
+            <div className={FIELD_GROUP}>
+              <label htmlFor="hostEvalContent" className={LABEL}>
+                Catatan evaluasi host (cara membawakan, gaya bicara, hal yang perlu diperbaiki, dll.)
+              </label>
+              <textarea id="hostEvalContent" name="content" required className={TEXTAREA} />
+            </div>
+            <button type="submit" className={BUTTON_PRIMARY}>
+              Tambah
+            </button>
+          </form>
+        </>
+      ) : (
+        <p className={EMPTY_STATE}>
+          Belum ada host yang ditentukan untuk episode ini.{" "}
+          <Link href={`/episodes/${episodeId}`} className="text-primary-700 hover:underline">
+            Tentukan host di halaman detail episode
+          </Link>
+          .
+        </p>
+      )}
     </main>
   );
 }

@@ -43,6 +43,20 @@ export async function updateRecordingScheduleAction(episodeId: string, formData:
   revalidatePath(`/episodes/${episodeId}`);
 }
 
+export async function updateEpisodeHostAction(episodeId: string, formData: FormData) {
+  await requireEditableStage(episodeId, "PRA_PRODUKSI");
+
+  const raw = formData.get("hostId");
+  const hostId = typeof raw === "string" && raw ? raw : null;
+
+  await prisma.episode.update({
+    where: { id: episodeId },
+    data: { hostId },
+  });
+
+  revalidatePath(`/episodes/${episodeId}`);
+}
+
 export async function updateEpisodeStageAction(episodeId: string, formData: FormData) {
   const episode = await prisma.episode.findUnique({ where: { id: episodeId } });
   if (!episode) throw new Error("Episode tidak ditemukan.");

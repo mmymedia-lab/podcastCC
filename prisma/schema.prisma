@@ -80,6 +80,8 @@ model Episode {
   title                String
   stage                EpisodeStage      @default(BANK_TEMA)
   recordingScheduledAt DateTime?
+  hostId               String?
+  host                 Host?             @relation(fields: [hostId], references: [id], onDelete: SetNull)
   themeIdea            ThemeIdea?
   outlineItems         OutlineItem[]
   guestQuestions       GuestQuestion[]
@@ -88,6 +90,7 @@ model Episode {
   rundownSegments      RundownSegment[]
   timestampMarkers     TimestampMarker[]
   evaluationNotes      EvaluationNote[]
+  hostEvaluations      HostEvaluation[]
   roles                EpisodeRole[]
   showNotesDraft       String?
   showNotesExternalUrl String?
@@ -96,6 +99,36 @@ model Episode {
   publishTags          String[]          @default([])
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
+}
+
+// A reusable roster of hosts/moderators (unlike Guest, which is per-episode
+// and one-off) — the same host typically runs many episodes, so the team
+// references their bio/contact during Pra-Produksi instead of re-entering
+// it each time. Deliberately just informational (name/contact/bio), not
+// linked to Gemini prompts — see the per-user Gemini key feature for that
+// kind of AI-facing personalization instead.
+model Host {
+  id          String           @id @default(cuid())
+  name        String
+  contact     String?
+  bio         String?
+  episodes    Episode[]
+  evaluations HostEvaluation[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+// Distinct from EvaluationNote: EvaluationNote is about the episode/topic
+// itself (and can become a new Bank Tema idea), while this is specifically
+// about how the assigned host performed on a given episode.
+model HostEvaluation {
+  id        String   @id @default(cuid())
+  hostId    String
+  host      Host     @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  episodeId String
+  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
 }
 
 model OutlineItem {
