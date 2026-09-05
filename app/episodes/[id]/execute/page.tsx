@@ -11,7 +11,10 @@ export default async function ExecutePage({
   await requireSession();
   const { id: episodeId } = await params;
 
-  const episode = await prisma.episode.findUnique({ where: { id: episodeId } });
+  const episode = await prisma.episode.findUnique({
+    where: { id: episodeId },
+    include: { host: { select: { name: true } } },
+  });
   if (!episode) notFound();
 
   const segments = await prisma.rundownSegment.findMany({
@@ -32,12 +35,19 @@ export default async function ExecutePage({
     select: { id: true, content: true },
   });
 
+  const guests = await prisma.guest.findMany({
+    where: { episodeId },
+    select: { id: true, name: true, contact: true, briefingNotes: true },
+  });
+
   return (
     <ExecuteClient
       episodeId={episodeId}
       episodeTitle={episode.title}
+      hostName={episode.host?.name ?? null}
       segments={segments}
       guestQuestions={guestQuestions}
+      guests={guests}
     />
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Segment = {
@@ -14,6 +13,13 @@ type Segment = {
 type GuestQuestion = {
   id: string;
   content: string;
+};
+
+type Guest = {
+  id: string;
+  name: string;
+  contact: string | null;
+  briefingNotes: string | null;
 };
 
 // Exported so it can be covered by a unit test (see formatElapsed.test.ts).
@@ -31,13 +37,17 @@ const CORNER_BUTTON_CLASS =
 export function ExecuteClient({
   episodeId,
   episodeTitle,
+  hostName,
   segments,
   guestQuestions,
+  guests,
 }: {
   episodeId: string;
   episodeTitle: string;
+  hostName: string | null;
   segments: Segment[];
   guestQuestions: GuestQuestion[];
+  guests: Guest[];
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -51,8 +61,11 @@ export function ExecuteClient({
   const [noteDraft, setNoteDraft] = useState(segments[0]?.sessionNote ?? "");
   const [noteStatus, setNoteStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [showQuestions, setShowQuestions] = useState(false);
+  const [showRundown, setShowRundown] = useState(false);
+  const [showGuests, setShowGuests] = useState(false);
   const [tvPairing, setTvPairing] = useState<{ code: string; url: string } | null>(null);
   const [tvPairingStatus, setTvPairingStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [closeBlocked, setCloseBlocked] = useState(false);
 
   const activeSegment = segments[activeIndex];
 
@@ -95,6 +108,17 @@ export function ExecuteClient({
     } catch {
       setTvPairingStatus("error");
     }
+  }
+
+  // Mode Eksekusi is always opened in its own tab (see the "Mode Eksekusi"
+  // link on the Rundown page, target="_blank"), so "Keluar" should close
+  // that tab rather than navigate elsewhere in it. window.close() only
+  // works on a tab the script itself can prove was script-opened (true
+  // here) — if a browser still refuses, fall back to a visible hint
+  // instead of silently doing nothing.
+  function exitExecution() {
+    window.close();
+    setTimeout(() => setCloseBlocked(true), 300);
   }
 
   async function toggleFullscreen() {
@@ -145,9 +169,14 @@ export function ExecuteClient({
       <button onClick={toggleFullscreen} className={CORNER_BUTTON_CLASS}>
         {isFullscreen ? "⛶ Keluar Fullscreen" : "⛶ Fullscreen"}
       </button>
-      <Link href={`/episodes/${episodeId}/rundown`} className={CORNER_BUTTON_CLASS}>
+      <button onClick={exitExecution} className={CORNER_BUTTON_CLASS}>
         ✕ Keluar
-      </Link>
+      </button>
+      {closeBlocked && (
+        <span className="rounded-lg bg-slate-900/80 px-3 py-2 text-xs text-slate-400 backdrop-blur">
+          Tutup tab ini secara manual (Ctrl+W).
+        </span>
+      )}
     </div>
   );
 
@@ -187,7 +216,10 @@ export function ExecuteClient({
     <main className="min-h-screen bg-slate-950 px-8 py-12 text-lg leading-relaxed text-slate-50 md:px-16 md:py-16">
       {cornerButtons}
       {tvPairingModal}
-      <p className="mb-0 text-base text-slate-500">{episodeTitle}</p>
+      <p className="mb-0 text-base text-slate-500">
+        {episodeTitle}
+        {hostName && <> · Host: {hostName}</>}
+      </p>
       <p className="mt-1 text-base text-slate-500">
         Segmen {activeIndex + 1} dari {segments.length} · Estimasi {activeSegment.estimatedMinutes} menit
       </p>
@@ -218,6 +250,59 @@ export function ExecuteClient({
           Segmen Berikutnya →
         </button>
       </div>
+
+      <div className="mb-10 max-w-2xl">
+        <button
+          onClick={() => setShowRundown((value) => !value)}
+          className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-slate-500 hover:bg-slate-800"
+        >
+          {showRundown ? "▲ Sembunyikan Ringkasan Rundown" : "▼ Ringkasan Rundown"}
+        </button>
+        {showRundown && (
+          <ol className="mt-3 space-y-1 text-base">
+            {segments.map((segment, index) => (
+              <li key={segment.id}>
+                <button
+                  onClick={() => goToSegment(index)}
+                  className={`w-full rounded-md px-3 py-2 text-left transition-colors ${
+                    index === activeIndex
+                      ? "bg-emerald-900/40 text-emerald-300"
+                      : "text-slate-300 hover:bg-slate-800"
+                  }`}
+                >
+                  {index + 1}. {segment.title} · {segment.estimatedMinutes} menit
+                </button>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+
+      {guests.length > 0 && (
+        <div className="mb-10 max-w-2xl">
+          <button
+            onClick={() => setShowGuests((value) => !value)}
+            className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-slate-500 hover:bg-slate-800"
+          >
+            {showGuests ? "▲ Sembunyikan Info Tamu" : "▼ Info Tamu"}
+          </button>
+          {showGuests && (
+            <ul className="mt-3 space-y-3 text-base text-slate-200">
+              {guests.map((guest) => (
+                <li key={guest.id} className="rounded-md border border-slate-800 bg-slate-900/50 p-3">
+                  <p className="font-semibold text-slate-100">
+                    {guest.name}
+                    {guest.contact && <span className="ml-2 font-normal text-slate-400">({guest.contact})</span>}
+                  </p>
+                  {guest.briefingNotes && (
+                    <p className="mt-1 whitespace-pre-wrap text-slate-300">{guest.briefingNotes}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {guestQuestions.length > 0 && (
         <div className="mb-10 max-w-2xl">

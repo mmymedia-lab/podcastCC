@@ -39,6 +39,9 @@ export async function GET(
         orderBy: { order: "asc" },
         select: { id: true, content: true },
       },
+      guests: {
+        select: { id: true, name: true, contact: true, briefingNotes: true },
+      },
     },
   });
 
@@ -66,7 +69,17 @@ export async function GET(
           segmentStartedAt: episode.activeSegmentStartedAt,
         }
       : null,
+    // Lightweight — just enough for a companion display's own rundown
+    // overview (mirrors Mode Eksekusi's "Ringkasan Rundown" panel). No
+    // talkingPoints here; that only matters for the currently active
+    // segment, already covered by activeSegment above.
+    segments: episode.rundownSegments.map((segment) => ({
+      id: segment.id,
+      title: segment.title,
+      estimatedMinutes: segment.estimatedMinutes,
+    })),
     guestQuestions: episode.guestQuestions,
+    guests: episode.guests,
     connectionStatus: "live",
   });
 }
