@@ -14,7 +14,9 @@ type SessionData = {
     estimatedMinutes: number;
     segmentStartedAt: string;
   } | null;
+  segments: { id: string; title: string; estimatedMinutes: number }[];
   guestQuestions: { id: string; content: string }[];
+  guests: { id: string; name: string; contact: string | null; briefingNotes: string | null }[];
 };
 
 type FetchState = "connecting" | "live" | "not_found" | "expired" | "disconnected";
@@ -122,8 +124,47 @@ export function TvDisplayClient({ code }: { code: string }) {
         </p>
       )}
 
+      {data.segments.length > 1 && (
+        <div className="mt-8 max-w-2xl">
+          <h2 className="mb-3 text-sm uppercase tracking-wide text-slate-500">Ringkasan Rundown</h2>
+          <ol className="space-y-1 text-base">
+            {data.segments.map((segment, index) => (
+              <li
+                key={segment.id}
+                className={`rounded-md px-3 py-2 ${
+                  index === data.activeSegmentIndex
+                    ? "bg-emerald-900/40 text-emerald-300"
+                    : "text-slate-300"
+                }`}
+              >
+                {index + 1}. {segment.title} · {segment.estimatedMinutes} menit
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {data.guests.length > 0 && (
+        <div className="mt-8 max-w-2xl">
+          <h2 className="mb-3 text-sm uppercase tracking-wide text-slate-500">Info Tamu</h2>
+          <ul className="space-y-3 text-base text-slate-200">
+            {data.guests.map((guest) => (
+              <li key={guest.id} className="rounded-md border border-slate-800 bg-slate-900/50 p-3">
+                <p className="font-semibold text-slate-100">
+                  {guest.name}
+                  {guest.contact && <span className="ml-2 font-normal text-slate-400">({guest.contact})</span>}
+                </p>
+                {guest.briefingNotes && (
+                  <p className="mt-1 whitespace-pre-wrap text-slate-300">{guest.briefingNotes}</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {data.guestQuestions.length > 0 && (
-        <div className="mt-4 max-w-2xl">
+        <div className="mt-8 max-w-2xl">
           <h2 className="mb-3 text-sm uppercase tracking-wide text-slate-500">Pertanyaan Narasumber</h2>
           <ol className="list-decimal space-y-2 pl-6 text-base text-slate-200">
             {data.guestQuestions.map((question) => (
