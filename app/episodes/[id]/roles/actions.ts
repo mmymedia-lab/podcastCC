@@ -5,7 +5,12 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { EpisodeRoleType } from "@prisma/client";
 
-const ROLE_VALUES: EpisodeRoleType[] = ["PRODUCER", "HOST", "EDITOR"];
+const ROLE_VALUES: EpisodeRoleType[] = [
+  "LEADER_PRODUKSI",
+  "TIM_BRAINSTORMING",
+  "TIM_LIVE",
+  "TIM_EVALUASI",
+];
 
 export async function assignRoleAction(episodeId: string, formData: FormData) {
   await requireSession();
