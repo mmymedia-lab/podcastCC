@@ -82,6 +82,12 @@ model Episode {
   recordingScheduledAt DateTime?
   hostId               String?
   host                 Host?             @relation(fields: [hostId], references: [id], onDelete: SetNull)
+  // Which rundown segment Mode Eksekusi is currently showing, and when it
+  // started — persisted (not just client-side React state) so a companion
+  // display (TV/tablet/phone via TvPairing) can poll and stay in sync.
+  activeSegmentId       String?
+  activeSegment         RundownSegment?   @relation("EpisodeActiveSegment", fields: [activeSegmentId], references: [id], onDelete: SetNull)
+  activeSegmentStartedAt DateTime?
   themeIdea            ThemeIdea?
   outlineItems         OutlineItem[]
   guestQuestions       GuestQuestion[]
@@ -92,6 +98,7 @@ model Episode {
   evaluationNotes      EvaluationNote[]
   hostEvaluations      HostEvaluation[]
   roles                EpisodeRole[]
+  tvPairings           TvPairing[]
   showNotesDraft       String?
   showNotesExternalUrl String?
   publishTitle         String?
@@ -221,8 +228,25 @@ model RundownSegment {
   // ulang di segmen 3") — distinct from talkingPoints, which is prep
   // content authored beforehand.
   sessionNote      String?
+  activeInEpisodes Episode[] @relation("EpisodeActiveSegment")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+// Short-lived pairing code so a companion display (Smart TV app, or a
+// tablet/phone browser) can read live Mode Eksekusi state without a full
+// NextAuth login — see the Flutter companion-app spec, Milestone 0. Once
+// activated by a first successful read, a code no longer expires (until
+// the episode itself is deleted) so the display can reconnect after a
+// restart without re-pairing.
+model TvPairing {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  episodeId   String
+  episode     Episode   @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  activatedAt DateTime?
+  createdAt   DateTime  @default(now())
 }
 
 // Restructured from the original {PRODUCER, HOST, EDITOR} to mirror the
