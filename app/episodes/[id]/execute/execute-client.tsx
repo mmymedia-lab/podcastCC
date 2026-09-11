@@ -56,7 +56,10 @@ export function ExecuteClient({
   // the interval is throttled/paused, the next tick still lands on the
   // correct elapsed value instead of drifting — unlike a naive counter
   // that increments once per tick and simply misses ticks while hidden.
-  const [segmentStartedAt, setSegmentStartedAt] = useState(() => Date.now());
+  // Timer does not start on its own — host must press "Play" for each
+  // segment (see isRunning below).
+  const [segmentStartedAt, setSegmentStartedAt] = useState<number | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [noteDraft, setNoteDraft] = useState(segments[0]?.sessionNote ?? "");
   const [noteStatus, setNoteStatus] = useState<"idle" | "saving" | "saved">("idle");
@@ -70,11 +73,12 @@ export function ExecuteClient({
   const activeSegment = segments[activeIndex];
 
   useEffect(() => {
+    if (!isRunning || segmentStartedAt === null) return;
     const tick = () => setElapsedMs(Date.now() - segmentStartedAt);
     tick();
     const interval = setInterval(tick, 250);
     return () => clearInterval(interval);
-  }, [segmentStartedAt]);
+  }, [isRunning, segmentStartedAt]);
 
   useEffect(() => {
     const onFullscreenChange = () => setIsFullscreen(Boolean(document.fullscreenElement));
@@ -84,11 +88,28 @@ export function ExecuteClient({
 
   // Persists the active segment server-side so a paired TV/tablet/phone
   // display (see showOnTv below) can poll and stay in sync — Mode
-  // Eksekusi otherwise only tracks this in local React state.
+  // Eksekusi otherwise only tracks this in local React state. Marked as
+  // not-started here; startSegmentTimer() below flips it to started once
+  // the host actually presses Play.
   useEffect(() => {
     if (!activeSegment) return;
-    fetch(`/api/rundown-segments/${activeSegment.id}/activate`, { method: "PATCH" }).catch(() => {});
+    fetch(`/api/rundown-segments/${activeSegment.id}/activate`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ started: false }),
+    }).catch(() => {});
   }, [activeSegment?.id]);
+
+  function startSegmentTimer() {
+    if (!activeSegment) return;
+    setSegmentStartedAt(Date.now());
+    setIsRunning(true);
+    fetch(`/api/rundown-segments/${activeSegment.id}/activate`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ started: true }),
+    }).catch(() => {});
+  }
 
   async function showOnTv() {
     setTvPairingStatus("loading");
@@ -137,7 +158,9 @@ export function ExecuteClient({
   function goToSegment(index: number) {
     if (index < 0 || index >= segments.length) return;
     setActiveIndex(index);
-    setSegmentStartedAt(Date.now());
+    setSegmentStartedAt(null);
+    setIsRunning(false);
+    setElapsedMs(0);
     setNoteDraft(segments[index]?.sessionNote ?? "");
     setNoteStatus("idle");
   }
@@ -226,9 +249,19 @@ export function ExecuteClient({
 
       <h1 className="my-4 text-3xl font-bold text-slate-50 md:text-4xl">{activeSegment.title}</h1>
 
-      <p className="my-4 font-mono text-6xl font-semibold tabular-nums text-emerald-400 md:text-7xl">
-        {formatElapsed(elapsedMs)}
-      </p>
+      <div className="my-4 flex flex-wrap items-center gap-6">
+        <p className="font-mono text-6xl font-semibold tabular-nums text-emerald-400 md:text-7xl">
+          {formatElapsed(elapsedMs)}
+        </p>
+        {!isRunning && (
+          <button
+            onClick={startSegmentTimer}
+            className="rounded-lg bg-emerald-700 px-6 py-3 text-lg font-semibold text-white hover:bg-emerald-600"
+          >
+            ▶ Mulai Segmen Ini
+          </button>
+        )}
+      </div>
 
       <p className="mb-8 max-w-3xl whitespace-pre-wrap text-xl text-slate-100 md:text-2xl">
         {activeSegment.talkingPoints}

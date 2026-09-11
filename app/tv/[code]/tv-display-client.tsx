@@ -12,7 +12,7 @@ type SessionData = {
     title: string;
     talkingPoints: string;
     estimatedMinutes: number;
-    segmentStartedAt: string;
+    segmentStartedAt: string | null;
   } | null;
   segments: { id: string; title: string; estimatedMinutes: number }[];
   guestQuestions: { id: string; content: string }[];
@@ -64,7 +64,7 @@ export function TvDisplayClient({ code }: { code: string }) {
   }, [code]);
 
   useEffect(() => {
-    if (!data?.activeSegment) return;
+    if (!data?.activeSegment?.segmentStartedAt) return;
     const startedAt = new Date(data.activeSegment.segmentStartedAt).getTime();
     const tick = () => setElapsedMs(Date.now() - startedAt);
     tick();
@@ -111,9 +111,13 @@ export function TvDisplayClient({ code }: { code: string }) {
       {data.activeSegment ? (
         <>
           <h1 className="my-4 text-3xl font-bold text-slate-50 md:text-4xl">{data.activeSegment.title}</h1>
-          <p className="my-4 font-mono text-6xl font-semibold tabular-nums text-emerald-400 md:text-7xl">
-            {formatElapsed(elapsedMs)}
-          </p>
+          {data.activeSegment.segmentStartedAt ? (
+            <p className="my-4 font-mono text-6xl font-semibold tabular-nums text-emerald-400 md:text-7xl">
+              {formatElapsed(elapsedMs)}
+            </p>
+          ) : (
+            <p className="my-4 text-2xl text-slate-400">Menunggu host memulai segmen ini...</p>
+          )}
           <p className="mb-8 max-w-3xl whitespace-pre-wrap text-xl text-slate-100 md:text-2xl">
             {data.activeSegment.talkingPoints}
           </p>
