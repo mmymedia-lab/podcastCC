@@ -300,6 +300,7 @@ model Project {
   storyboardFrames  StoryboardFrame[]
   shotListItems     ShotListItem[]
   shootingDays      ShootingDay[]
+  editVersions      EditVersion[]
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }
@@ -413,5 +414,48 @@ model ContinuityNote {
   takeNumber    Int?
   isGood        Boolean     @default(false)
   notes         String
+  createdAt     DateTime    @default(now())
+}
+
+// Pasca-Produksi. Each row is one uploaded cut, tagged with which stage
+// of the edit pipeline it represents — not one row whose stage gets
+// promoted in place, since each new cut is a genuinely new upload (a new
+// Google Drive link), matching how editors actually work: Rough Cut,
+// Fine Cut, and Picture Lock are distinct files, not one file relabeled.
+enum EditVersionStage {
+  ROUGH_CUT
+  FINE_CUT
+  PICTURE_LOCK
+}
+
+enum EditApprovalStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+}
+
+model EditVersion {
+  id             String              @id @default(cuid())
+  projectId      String
+  project        Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  stage          EditVersionStage
+  driveUrl       String
+  approvalStatus EditApprovalStatus  @default(DRAFT)
+  order          Int
+  revisionNotes  RevisionNote[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+}
+
+// Reviewer feedback on one EditVersion. `resolved` lets the editor track
+// which notes still need addressing without deleting the record of what
+// was asked — distinct from ContinuityNote, which is the on-set log, not
+// post-production review feedback.
+model RevisionNote {
+  id            String      @id @default(cuid())
+  editVersionId String
+  editVersion   EditVersion @relation(fields: [editVersionId], references: [id], onDelete: Cascade)
+  content       String
+  resolved      Boolean     @default(false)
   createdAt     DateTime    @default(now())
 }
