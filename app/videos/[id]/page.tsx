@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { getWorkspaceSettings } from "@/lib/workspace-settings";
 import { STAGE_ORDER, STAGE_LABELS } from "../stages";
 import { updateProjectStageAction, deleteProjectAction } from "../actions";
 import { ProjectStageBadge } from "@/components/ui/ProjectStageBadge";
@@ -18,6 +19,8 @@ export default async function ProjectDetailPage({
 
   const project = await prisma.project.findUnique({ where: { id } });
   if (!project) notFound();
+
+  const settings = await getWorkspaceSettings();
 
   return (
     <main className={PAGE_WIDE}>
@@ -77,11 +80,22 @@ export default async function ProjectDetailPage({
             </Link>
           </div>
 
-          <p className="mb-3 mt-4 text-sm text-slate-600">
-            Fitur distribusi (deliverables checklist, dst.) dan role-based access menyusul di
-            milestone berikutnya.
-          </p>
+          <p className="mb-3 mt-4 text-sm font-medium text-slate-700">Distribusi & Evaluasi</p>
           <div className="flex flex-wrap gap-2">
+            <Link href={`/videos/${project.id}/deliverables`} className={BUTTON_SECONDARY}>
+              Deliverables
+            </Link>
+            <Link href={`/videos/${project.id}/evaluation`} className={BUTTON_SECONDARY}>
+              Evaluasi Pasca-Tayang
+            </Link>
+            {settings.mode === "TIM" && (
+              <Link href={`/videos/${project.id}/roles`} className={BUTTON_SECONDARY}>
+                Peran Tim
+              </Link>
+            )}
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
             <Link href={`/videos/${project.id}/edit`} className={BUTTON_SECONDARY}>
               Edit Judul
             </Link>

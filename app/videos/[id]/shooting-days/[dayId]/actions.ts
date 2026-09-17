@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/session";
+import { requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireNotes(raw: FormDataEntryValue | null): string {
@@ -28,7 +28,7 @@ export async function createContinuityNoteAction(
   shootingDayId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRODUKSI");
 
   await prisma.continuityNote.create({
     data: {
@@ -48,7 +48,7 @@ export async function deleteContinuityNoteAction(
   shootingDayId: string,
   noteId: string,
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRODUKSI");
   await prisma.continuityNote.delete({ where: { id: noteId } });
   revalidatePath(`/videos/${projectId}/shooting-days/${shootingDayId}`);
 }

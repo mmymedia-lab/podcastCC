@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 // Per the system plan's file-storage decision: no upload here at all —
@@ -29,7 +29,7 @@ function optionalText(raw: FormDataEntryValue | null): string | null {
 }
 
 export async function createStoryboardFrameAction(projectId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
 
   const last = await prisma.storyboardFrame.findFirst({
     where: { projectId },
@@ -53,7 +53,7 @@ export async function updateStoryboardFrameAction(
   itemId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
 
   await prisma.storyboardFrame.update({
     where: { id: itemId },
@@ -68,7 +68,7 @@ export async function updateStoryboardFrameAction(
 }
 
 export async function deleteStoryboardFrameAction(projectId: string, itemId: string) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
   await prisma.storyboardFrame.delete({ where: { id: itemId } });
   revalidatePath(`/videos/${projectId}/storyboard`);
 }
@@ -78,7 +78,7 @@ export async function moveStoryboardFrameAction(
   itemId: string,
   direction: "up" | "down",
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
 
   const items = await prisma.storyboardFrame.findMany({
     where: { projectId },

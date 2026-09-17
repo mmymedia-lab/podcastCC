@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireLocation(raw: FormDataEntryValue | null): string {
@@ -17,7 +17,7 @@ function optionalText(raw: FormDataEntryValue | null): string | null {
 }
 
 export async function createScriptBreakdownAction(projectId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
 
   const last = await prisma.scriptBreakdown.findFirst({
     where: { projectId },
@@ -43,7 +43,7 @@ export async function updateScriptBreakdownAction(
   itemId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
 
   await prisma.scriptBreakdown.update({
     where: { id: itemId },
@@ -60,7 +60,7 @@ export async function updateScriptBreakdownAction(
 }
 
 export async function deleteScriptBreakdownAction(projectId: string, itemId: string) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
   await prisma.scriptBreakdown.delete({ where: { id: itemId } });
   revalidatePath(`/videos/${projectId}/script-breakdown`);
 }
@@ -70,7 +70,7 @@ export async function moveScriptBreakdownAction(
   itemId: string,
   direction: "up" | "down",
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
 
   const items = await prisma.scriptBreakdown.findMany({
     where: { projectId },
