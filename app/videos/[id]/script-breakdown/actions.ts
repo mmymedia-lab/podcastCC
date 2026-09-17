@@ -38,6 +38,28 @@ export async function createScriptBreakdownAction(projectId: string, formData: F
   revalidatePath(`/videos/${projectId}/script-breakdown`);
 }
 
+// Adds one AI-suggested scene directly (see ai-script-breakdown-assist.tsx)
+// — only `location` is known from a one-line suggestion, so props/cast/notes
+// stay empty for the user to fill in manually, same as any other scene.
+export async function createScriptBreakdownFromSuggestionAction(projectId: string, location: string) {
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
+
+  const last = await prisma.scriptBreakdown.findFirst({
+    where: { projectId },
+    orderBy: { order: "desc" },
+  });
+
+  await prisma.scriptBreakdown.create({
+    data: {
+      projectId,
+      location,
+      order: (last?.order ?? 0) + 1,
+    },
+  });
+
+  revalidatePath(`/videos/${projectId}/script-breakdown`);
+}
+
 export async function updateScriptBreakdownAction(
   projectId: string,
   itemId: string,
