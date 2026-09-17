@@ -292,12 +292,15 @@ enum ProjectStage {
 }
 
 model Project {
-  id        String        @id @default(cuid())
-  title     String
-  stage     ProjectStage  @default(IDE)
-  roles     ProjectRole[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id                String            @id @default(cuid())
+  title             String
+  stage             ProjectStage      @default(IDE)
+  roles             ProjectRole[]
+  scriptBreakdowns  ScriptBreakdown[]
+  storyboardFrames  StoryboardFrame[]
+  shotListItems     ShotListItem[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 }
 
 // Mirrors EpisodeRoleType's shape but kept as its own enum — a video
@@ -321,4 +324,53 @@ model ProjectRole {
   createdAt DateTime        @default(now())
 
   @@unique([projectId, userId, role])
+}
+
+// Pre-production, per scene: what a scene needs (location, props, cast) so
+// the team can plan logistics/budget/casting from it — distinct from
+// StoryboardFrame (visual framing) and ShotListItem (technical camera
+// setup), which are deliberately separate models even though all three are
+// "ordered content per Project", mirroring how the research behind this
+// system found each is typically authored by a different person.
+model ScriptBreakdown {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  location  String
+  props     String?
+  cast      String?
+  notes     String?
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// One frame per shot. Per the system plan's file-storage decision, this
+// never stores an uploaded image — just a link to one already uploaded to
+// Google Drive by the team.
+model StoryboardFrame {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  driveUrl  String
+  notes     String?
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// The technical camera setup for one shot — distinct from StoryboardFrame
+// (how it should look) and RundownSegment on the podcast side (this is
+// Project's, not Episode's).
+model ShotListItem {
+  id               String   @id @default(cuid())
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  description      String
+  angle            String?
+  lens             String?
+  estimatedMinutes Int      @default(5)
+  order            Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
