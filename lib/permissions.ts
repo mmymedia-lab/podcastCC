@@ -1,4 +1,4 @@
-import { EpisodeRoleType, EpisodeStage } from "@prisma/client";
+import { EpisodeRoleType, EpisodeStage, ProjectRoleType, ProjectStage } from "@prisma/client";
 import { prisma } from "./prisma";
 import { requireSession, resolveUserId } from "./session";
 
@@ -72,6 +72,59 @@ export async function requireEditableStage(episodeId: string, stage: EpisodeStag
   }
 
   const allowed = await canEditStage(userId, episodeId, stage);
+  if (!allowed) {
+    throw new Error("Kamu tidak punya izin mengedit tahap ini.");
+  }
+
+  return session;
+}
+
+// --- Video production (Project) ---
+//
+// Mirrors the Episode role-gating above but for Project/ProjectRoleType,
+// which has its own vocabulary (see prisma/schema.prisma). Content areas
+// gate on the conceptual stage they belong to (e.g. Storyboard always
+// gates on PRA_PRODUKSI), independent of the project's current `stage`
+// field — the same design as STAGE_ROLE_ACCESS above.
+const PROJECT_STAGE_ROLE_ACCESS: Record<ProjectStage, ProjectRoleType[]> = {
+  IDE: ["LEADER_PRODUKSI_VIDEO", "TIM_PRA_PRODUKSI"],
+  PRA_PRODUKSI: ["LEADER_PRODUKSI_VIDEO", "TIM_PRA_PRODUKSI"],
+  PRODUKSI: ["LEADER_PRODUKSI_VIDEO", "TIM_PRODUKSI"],
+  PASCA_PRODUKSI: ["LEADER_PRODUKSI_VIDEO", "TIM_PASCA_PRODUKSI"],
+  // No dedicated "Tim Distribusi" role exists — deliverables and
+  // post-release evaluation are treated as the post-production team's
+  // responsibility, the same team that already owns the edit pipeline.
+  DISTRIBUSI: ["LEADER_PRODUKSI_VIDEO", "TIM_PASCA_PRODUKSI"],
+};
+
+/** Project counterpart to canEditStage() — see its docs for the Solo/Tim/fail-open rules. */
+export async function canEditProjectStage(
+  userId: string,
+  projectId: string,
+  stage: ProjectStage,
+): Promise<boolean> {
+  const settings = await prisma.workspaceSettings.findUnique({ where: { id: 1 } });
+  if (!settings || settings.mode === "SOLO") return true;
+
+  const roles = await prisma.projectRole.findMany({ where: { projectId } });
+  if (roles.length === 0) return true;
+
+  const userRoles = roles.filter((role) => role.userId === userId).map((role) => role.role);
+  if (userRoles.length === 0) return false;
+
+  const allowedRoles = PROJECT_STAGE_ROLE_ACCESS[stage];
+  return userRoles.some((role) => allowedRoles.includes(role));
+}
+
+/** Project counterpart to requireEditableStage() — see its docs. */
+export async function requireEditableProjectStage(projectId: string, stage: ProjectStage) {
+  const session = await requireSession();
+  const userId = await resolveUserId(session);
+  if (!userId) {
+    throw new Error("Sesi tidak valid, silakan login ulang.");
+  }
+
+  const allowed = await canEditProjectStage(userId, projectId, stage);
   if (!allowed) {
     throw new Error("Kamu tidak punya izin mengedit tahap ini.");
   }

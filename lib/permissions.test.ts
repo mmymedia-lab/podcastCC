@@ -4,18 +4,21 @@ vi.mock("./prisma", () => ({
   prisma: {
     workspaceSettings: { findUnique: vi.fn() },
     episodeRole: { findMany: vi.fn() },
+    projectRole: { findMany: vi.fn() },
   },
 }));
 
 import { prisma } from "./prisma";
-import { canEditStage } from "./permissions";
+import { canEditProjectStage, canEditStage } from "./permissions";
 
 const workspaceSettings = prisma.workspaceSettings as unknown as { findUnique: ReturnType<typeof vi.fn> };
 const episodeRole = prisma.episodeRole as unknown as { findMany: ReturnType<typeof vi.fn> };
+const projectRole = prisma.projectRole as unknown as { findMany: ReturnType<typeof vi.fn> };
 
 beforeEach(() => {
   workspaceSettings.findUnique.mockReset();
   episodeRole.findMany.mockReset();
+  projectRole.findMany.mockReset();
 });
 
 describe("canEditStage", () => {
@@ -83,6 +86,68 @@ describe("canEditStage", () => {
       "EVALUASI",
     ] as const) {
       expect(await canEditStage("user-1", "ep-1", stage)).toBe(true);
+    }
+  });
+});
+
+describe("canEditProjectStage", () => {
+  it("allows editing when no workspace settings exist yet", async () => {
+    workspaceSettings.findUnique.mockResolvedValue(null);
+
+    expect(await canEditProjectStage("user-1", "proj-1", "PRA_PRODUKSI")).toBe(true);
+  });
+
+  it("allows editing in Solo mode regardless of roles", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "SOLO" });
+
+    expect(await canEditProjectStage("user-1", "proj-1", "DISTRIBUSI")).toBe(true);
+    expect(projectRole.findMany).not.toHaveBeenCalled();
+  });
+
+  it("fails open in Tim mode when the project has no roles configured", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
+    projectRole.findMany.mockResolvedValue([]);
+
+    expect(await canEditProjectStage("user-1", "proj-1", "DISTRIBUSI")).toBe(true);
+  });
+
+  it("denies a user with no role on the project once roles are configured", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
+    projectRole.findMany.mockResolvedValue([
+      { projectId: "proj-1", userId: "other-user", role: "LEADER_PRODUKSI_VIDEO" },
+    ]);
+
+    expect(await canEditProjectStage("user-1", "proj-1", "PRA_PRODUKSI")).toBe(false);
+  });
+
+  it("denies a role that isn't allowed to edit the given stage", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
+    projectRole.findMany.mockResolvedValue([
+      { projectId: "proj-1", userId: "user-1", role: "TIM_PRODUKSI" },
+    ]);
+
+    // TIM_PRODUKSI can't edit PRA_PRODUKSI per PROJECT_STAGE_ROLE_ACCESS.
+    expect(await canEditProjectStage("user-1", "proj-1", "PRA_PRODUKSI")).toBe(false);
+  });
+
+  it("allows a role that is allowed to edit the given stage", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
+    projectRole.findMany.mockResolvedValue([
+      { projectId: "proj-1", userId: "user-1", role: "TIM_PASCA_PRODUKSI" },
+    ]);
+
+    expect(await canEditProjectStage("user-1", "proj-1", "PASCA_PRODUKSI")).toBe(true);
+    expect(await canEditProjectStage("user-1", "proj-1", "DISTRIBUSI")).toBe(true);
+  });
+
+  it("always allows LEADER_PRODUKSI_VIDEO regardless of stage", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
+    projectRole.findMany.mockResolvedValue([
+      { projectId: "proj-1", userId: "user-1", role: "LEADER_PRODUKSI_VIDEO" },
+    ]);
+
+    for (const stage of ["IDE", "PRA_PRODUKSI", "PRODUKSI", "PASCA_PRODUKSI", "DISTRIBUSI"] as const) {
+      expect(await canEditProjectStage("user-1", "proj-1", stage)).toBe(true);
     }
   });
 });

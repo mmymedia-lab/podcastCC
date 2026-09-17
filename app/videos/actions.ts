@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
+import { requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { ProjectStage } from "@prisma/client";
 import { STAGE_ORDER } from "./stages";
@@ -14,9 +15,14 @@ function requireTitle(raw: FormDataEntryValue | null): string {
   return raw.trim();
 }
 
-// Milestone 1: no role-based stage gating yet (Solo mode only, same as
-// the rest of this app pre-Tim-mode) — role-based access for Project
-// lands in a later milestone alongside ProjectRole CRUD.
+async function requireExistingProjectStage(id: string): Promise<ProjectStage> {
+  const project = await prisma.project.findUnique({ where: { id } });
+  if (!project) throw new Error("Proyek tidak ditemukan.");
+  return project.stage;
+}
+
+// No project exists yet at creation time, so there's nothing to gate on —
+// matches convertThemeIdeaToEpisodeAction on the podcast side.
 export async function createProjectAction(formData: FormData) {
   await requireSession();
 
@@ -29,7 +35,7 @@ export async function createProjectAction(formData: FormData) {
 }
 
 export async function updateProjectAction(id: string, formData: FormData) {
-  await requireSession();
+  await requireEditableProjectStage(id, await requireExistingProjectStage(id));
 
   await prisma.project.update({
     where: { id },
@@ -42,7 +48,9 @@ export async function updateProjectAction(id: string, formData: FormData) {
 }
 
 export async function updateProjectStageAction(id: string, formData: FormData) {
-  await requireSession();
+  // Gate on the CURRENT stage: moving the pipeline marker forward is itself
+  // an edit of whatever stage the project is presently in.
+  await requireEditableProjectStage(id, await requireExistingProjectStage(id));
 
   const stage = formData.get("stage");
   if (typeof stage !== "string" || !STAGE_ORDER.includes(stage as ProjectStage)) {
@@ -59,7 +67,7 @@ export async function updateProjectStageAction(id: string, formData: FormData) {
 }
 
 export async function deleteProjectAction(id: string) {
-  await requireSession();
+  await requireEditableProjectStage(id, await requireExistingProjectStage(id));
   await prisma.project.delete({ where: { id } });
   revalidatePath("/videos");
   redirect("/videos");

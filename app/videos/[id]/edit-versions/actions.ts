@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { EditApprovalStatus, EditVersionStage } from "@prisma/client";
 import { APPROVAL_STATUS_ORDER, EDIT_VERSION_STAGE_ORDER } from "./stages";
@@ -38,7 +38,7 @@ async function requireApprovedVersionExists(projectId: string) {
 }
 
 export async function createEditVersionAction(projectId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PASCA_PRODUKSI");
 
   const stage = formData.get("stage");
   if (typeof stage !== "string" || !EDIT_VERSION_STAGE_ORDER.includes(stage as EditVersionStage)) {
@@ -72,7 +72,7 @@ export async function updateApprovalStatusAction(
   versionId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PASCA_PRODUKSI");
 
   const status = formData.get("approvalStatus");
   if (typeof status !== "string" || !APPROVAL_STATUS_ORDER.includes(status as EditApprovalStatus)) {
@@ -89,7 +89,7 @@ export async function updateApprovalStatusAction(
 }
 
 export async function deleteEditVersionAction(projectId: string, versionId: string) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PASCA_PRODUKSI");
   await prisma.editVersion.delete({ where: { id: versionId } });
   revalidatePath(`/videos/${projectId}/edit-versions`);
   redirect(`/videos/${projectId}/edit-versions`);

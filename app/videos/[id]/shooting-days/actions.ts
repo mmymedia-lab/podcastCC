@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function optionalText(raw: FormDataEntryValue | null): string | null {
@@ -14,7 +14,7 @@ function optionalDate(raw: FormDataEntryValue | null): Date | null {
 }
 
 export async function createShootingDayAction(projectId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRODUKSI");
 
   const last = await prisma.shootingDay.findFirst({
     where: { projectId },
@@ -38,7 +38,7 @@ export async function createShootingDayAction(projectId: string, formData: FormD
 }
 
 export async function updateShootingDayAction(projectId: string, dayId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRODUKSI");
 
   await prisma.shootingDay.update({
     where: { id: dayId },
@@ -58,7 +58,7 @@ export async function updateShootingDayAction(projectId: string, dayId: string, 
 }
 
 export async function deleteShootingDayAction(projectId: string, dayId: string) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRODUKSI");
   await prisma.shootingDay.delete({ where: { id: dayId } });
   revalidatePath(`/videos/${projectId}/shooting-days`);
   redirect(`/videos/${projectId}/shooting-days`);

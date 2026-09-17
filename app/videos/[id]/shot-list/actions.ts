@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireDescription(raw: FormDataEntryValue | null): string {
@@ -22,7 +22,7 @@ function parseMinutes(raw: FormDataEntryValue | null): number {
 }
 
 export async function createShotListItemAction(projectId: string, formData: FormData) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
 
   const last = await prisma.shotListItem.findFirst({
     where: { projectId },
@@ -48,7 +48,7 @@ export async function updateShotListItemAction(
   itemId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
 
   await prisma.shotListItem.update({
     where: { id: itemId },
@@ -65,7 +65,7 @@ export async function updateShotListItemAction(
 }
 
 export async function deleteShotListItemAction(projectId: string, itemId: string) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
   await prisma.shotListItem.delete({ where: { id: itemId } });
   revalidatePath(`/videos/${projectId}/shot-list`);
 }
@@ -75,7 +75,7 @@ export async function moveShotListItemAction(
   itemId: string,
   direction: "up" | "down",
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
 
   const items = await prisma.shotListItem.findMany({
     where: { projectId },

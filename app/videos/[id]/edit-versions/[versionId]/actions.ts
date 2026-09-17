@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/session";
+import { requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 function requireContent(raw: FormDataEntryValue | null): string {
@@ -16,7 +16,7 @@ export async function createRevisionNoteAction(
   versionId: string,
   formData: FormData,
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PASCA_PRODUKSI");
 
   await prisma.revisionNote.create({
     data: {
@@ -33,7 +33,7 @@ export async function toggleRevisionNoteResolvedAction(
   versionId: string,
   noteId: string,
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PASCA_PRODUKSI");
 
   const note = await prisma.revisionNote.findUnique({ where: { id: noteId } });
   if (!note) return;
@@ -51,7 +51,7 @@ export async function deleteRevisionNoteAction(
   versionId: string,
   noteId: string,
 ) {
-  await requireSession();
+  await requireEditableProjectStage(projectId, "PASCA_PRODUKSI");
   await prisma.revisionNote.delete({ where: { id: noteId } });
   revalidatePath(`/videos/${projectId}/edit-versions/${versionId}`);
 }
