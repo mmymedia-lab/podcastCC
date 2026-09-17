@@ -70,9 +70,16 @@ export default async function ProjectDetailPage({
             </Link>
           </div>
 
+          <p className="mb-3 mt-4 text-sm font-medium text-slate-700">Pasca-Produksi</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/videos/${project.id}/edit-versions`} className={BUTTON_SECONDARY}>
+              Edit Version & Revisi
+            </Link>
+          </div>
+
           <p className="mb-3 mt-4 text-sm text-slate-600">
-            Fitur pasca-produksi (edit version, revision notes, dst.) menyusul di milestone
-            berikutnya.
+            Fitur distribusi (deliverables checklist, dst.) dan role-based access menyusul di
+            milestone berikutnya.
           </p>
           <div className="flex flex-wrap gap-2">
             <Link href={`/videos/${project.id}/edit`} className={BUTTON_SECONDARY}>
