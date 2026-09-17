@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { createShotListItemAction, deleteShotListItemAction, moveShotListItemAction } from "./actions";
+import { AiShotListAssist } from "./ai-shot-list-assist";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
   BUTTON_DANGER,
@@ -48,6 +49,8 @@ export default async function ShotListPage({
         ]}
       />
       <h1 className={H1}>Shot List: {project.title}</h1>
+
+      <AiShotListAssist projectId={projectId} projectTitle={project.title} />
 
       <ol className={CARD_LIST}>
         {items.map((item, index) => (

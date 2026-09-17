@@ -43,6 +43,28 @@ export async function createShotListItemAction(projectId: string, formData: Form
   revalidatePath(`/videos/${projectId}/shot-list`);
 }
 
+// Adds one AI-suggested shot directly (see ai-shot-list-assist.tsx) — only
+// `description` is known from a one-line suggestion, so angle/lens stay
+// empty and estimatedMinutes keeps its default, same as manual entry.
+export async function createShotListItemFromSuggestionAction(projectId: string, description: string) {
+  await requireEditableProjectStage(projectId, "PRA_PRODUKSI");
+
+  const last = await prisma.shotListItem.findFirst({
+    where: { projectId },
+    orderBy: { order: "desc" },
+  });
+
+  await prisma.shotListItem.create({
+    data: {
+      projectId,
+      description,
+      order: (last?.order ?? 0) + 1,
+    },
+  });
+
+  revalidatePath(`/videos/${projectId}/shot-list`);
+}
+
 export async function updateShotListItemAction(
   projectId: string,
   itemId: string,

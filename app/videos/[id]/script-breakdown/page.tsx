@@ -7,6 +7,7 @@ import {
   deleteScriptBreakdownAction,
   moveScriptBreakdownAction,
 } from "./actions";
+import { AiScriptBreakdownAssist } from "./ai-script-breakdown-assist";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
   BUTTON_DANGER,
@@ -52,6 +53,8 @@ export default async function ScriptBreakdownPage({
         ]}
       />
       <h1 className={H1}>Script Breakdown: {project.title}</h1>
+
+      <AiScriptBreakdownAssist projectId={projectId} projectTitle={project.title} />
 
       <ol className={CARD_LIST}>
         {items.map((item, index) => (
