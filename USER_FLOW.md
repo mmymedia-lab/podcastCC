@@ -1,4 +1,4 @@
-# User Flow — Podcast Prep & Execution
+# User Flow — Yassalam Media Studio
 
 Diagram alur navigasi aplikasi, ditulis retroaktif untuk mengisi gap fase **5 — Desain & User Flow** (dilewati saat awal build, langsung ke PRD → coding). Berguna untuk onboarding kontributor baru dan referensi kalau ada perubahan struktur navigasi nanti.
 

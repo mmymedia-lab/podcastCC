@@ -32,6 +32,7 @@ model User {
   // once. Re-openable anytime from the nav bar regardless of this flag.
   hasSeenOnboarding Boolean       @default(false)
   episodeRoles EpisodeRole[]
+  projectRoles ProjectRole[]
   createdAt    DateTime      @default(now())
 }
 
@@ -271,4 +272,53 @@ model EpisodeRole {
   createdAt DateTime        @default(now())
 
   @@unique([episodeId, userId, role])
+}
+
+// --- Video production (Yassalam Media Studio) ---
+//
+// Project is the video-production counterpart to Episode (podcast).
+// Deliberately a fully separate model, not a variant of Episode: video
+// workflow needs different stages, a visual storyboard, multi-day shoots,
+// and a staged edit-approval pipeline (Rough Cut -> Fine Cut -> Picture
+// Lock) that Episode has no equivalent for. Coexists with Episode in the
+// same app/database, sharing only User and WorkspaceSettings — no
+// relation to Episode/EpisodeStage/EpisodeRoleType anywhere below.
+enum ProjectStage {
+  IDE
+  PRA_PRODUKSI
+  PRODUKSI
+  PASCA_PRODUKSI
+  DISTRIBUSI
+}
+
+model Project {
+  id        String        @id @default(cuid())
+  title     String
+  stage     ProjectStage  @default(IDE)
+  roles     ProjectRole[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+// Mirrors EpisodeRoleType's shape but kept as its own enum — a video
+// project and a podcast episode have distinct role vocabularies.
+enum ProjectRoleType {
+  LEADER_PRODUKSI_VIDEO
+  TIM_PRA_PRODUKSI
+  TIM_PRODUKSI
+  TIM_PASCA_PRODUKSI
+}
+
+// Only meaningful in Tim mode (see WorkspaceSettings, shared with
+// EpisodeRole). A user can hold more than one role on the same project.
+model ProjectRole {
+  id        String          @id @default(cuid())
+  projectId String
+  project   Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      ProjectRoleType
+  createdAt DateTime        @default(now())
+
+  @@unique([projectId, userId, role])
 }
