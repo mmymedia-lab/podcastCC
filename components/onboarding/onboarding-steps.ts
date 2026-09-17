@@ -6,7 +6,7 @@ export type OnboardingStep = {
 
 export const ONBOARDING_STEPS: OnboardingStep[] = [
   {
-    title: "Selamat datang di Podcast Prep & Execution",
+    title: "Selamat datang di Yassalam Media Studio",
     description:
       "Ini alat bantu internal untuk menyiapkan dan menjalankan produksi podcast, dari ide topik sampai evaluasi pasca-tayang. Dari Dashboard kamu bisa masuk ke Bank Tema, Episode, Pengaturan, dan Pengguna.",
     image: "/onboarding/01-dashboard.png",

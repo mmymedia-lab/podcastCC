@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { NavGate } from "@/components/ui/NavGate";
 
 export const metadata: Metadata = {
-  title: "Podcast Prep & Execution",
+  title: "Yassalam Media Studio",
 };
 
 export default async function RootLayout({

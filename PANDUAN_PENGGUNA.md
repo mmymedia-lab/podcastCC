@@ -1,4 +1,4 @@
-# Panduan Pengguna — Podcast Prep & Execution
+# Panduan Pengguna — Yassalam Media Studio
 
 Panduan singkat cara pakai aplikasi, dari ide episode sampai publish. Untuk detail teknis (deploy, arsitektur), lihat `README.md` dan `PRD.md`.
 

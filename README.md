@@ -1,4 +1,4 @@
-# Podcast Prep & Execution
+# Yassalam Media Studio
 
 Lihat `PRD.md` untuk spesifikasi produk lengkap.
 
