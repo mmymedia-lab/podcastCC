@@ -63,9 +63,16 @@ export default async function ProjectDetailPage({
               Shot List
             </Link>
           </div>
+          <p className="mb-3 mt-4 text-sm font-medium text-slate-700">Produksi</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/videos/${project.id}/shooting-days`} className={BUTTON_SECONDARY}>
+              Hari Syuting & Call Sheet
+            </Link>
+          </div>
+
           <p className="mb-3 mt-4 text-sm text-slate-600">
-            Fitur produksi dan pasca-produksi (call sheet, continuity log, edit version, dst.)
-            menyusul di milestone berikutnya.
+            Fitur pasca-produksi (edit version, revision notes, dst.) menyusul di milestone
+            berikutnya.
           </p>
           <div className="flex flex-wrap gap-2">
             <Link href={`/videos/${project.id}/edit`} className={BUTTON_SECONDARY}>

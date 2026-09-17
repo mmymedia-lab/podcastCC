@@ -299,6 +299,7 @@ model Project {
   scriptBreakdowns  ScriptBreakdown[]
   storyboardFrames  StoryboardFrame[]
   shotListItems     ShotListItem[]
+  shootingDays      ShootingDay[]
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }
@@ -373,4 +374,44 @@ model ShotListItem {
   order            Int
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+// Production, one row per shoot day. Holds the call sheet's own info
+// directly (call time, location, scene schedule, wrap estimate) rather
+// than as a separate 1:1 CallSheet model — a call sheet has no existence
+// apart from the day it belongs to, unlike ScriptBreakdown/
+// StoryboardFrame/ShotListItem, which are genuinely independent ordered
+// collections. A Project can have many ShootingDay rows for a
+// multi-day shoot (unlike Episode, which assumes a single recording
+// session).
+model ShootingDay {
+  id              String           @id @default(cuid())
+  projectId       String
+  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  scheduledDate   DateTime?
+  callTime        String?
+  location        String?
+  sceneSchedule   String?
+  wrapEstimate    String?
+  notes           String?
+  order           Int
+  continuityNotes ContinuityNote[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+// Per-take log during a shoot day (slate, take number, whether it was
+// good, continuity detail worth remembering for matching later shots) —
+// mirrors a script supervisor's paper log. Deliberately append-only:
+// create + delete only, no edit endpoint, since a live log is corrected
+// by adding/removing entries, not silently rewriting history.
+model ContinuityNote {
+  id            String      @id @default(cuid())
+  shootingDayId String
+  shootingDay   ShootingDay @relation(fields: [shootingDayId], references: [id], onDelete: Cascade)
+  slate         String?
+  takeNumber    Int?
+  isGood        Boolean     @default(false)
+  notes         String
+  createdAt     DateTime    @default(now())
 }
