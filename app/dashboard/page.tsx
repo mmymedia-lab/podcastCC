@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { href: "/settings", label: "Pengaturan Workspace", hint: "Mode Solo/Tim, API key Gemini" },
   { href: "/users", label: "Pengguna", hint: "Kelola akun pengguna" },
   { href: "/hosts", label: "Host", hint: "Roster host/moderator" },
-  { href: "/videos", label: "Video", hint: "Proyek produksi video (segera hadir)" },
+  { href: "/videos", label: "Video", hint: "Proyek produksi video & tahapnya" },
 ];
 
 export default async function DashboardPage({
