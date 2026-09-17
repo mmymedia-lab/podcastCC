@@ -51,8 +51,20 @@ export default async function ProjectDetailPage({
         </form>
 
         <div className={CARD}>
-          <p className="mb-3 text-sm text-slate-600">
-            Fitur pra-produksi, produksi, dan pasca-produksi (storyboard, shot list, call sheet, dst.)
+          <p className="mb-3 text-sm font-medium text-slate-700">Pra-Produksi</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/videos/${project.id}/script-breakdown`} className={BUTTON_SECONDARY}>
+              Script Breakdown
+            </Link>
+            <Link href={`/videos/${project.id}/storyboard`} className={BUTTON_SECONDARY}>
+              Storyboard
+            </Link>
+            <Link href={`/videos/${project.id}/shot-list`} className={BUTTON_SECONDARY}>
+              Shot List
+            </Link>
+          </div>
+          <p className="mb-3 mt-4 text-sm text-slate-600">
+            Fitur produksi dan pasca-produksi (call sheet, continuity log, edit version, dst.)
             menyusul di milestone berikutnya.
           </p>
           <div className="flex flex-wrap gap-2">
