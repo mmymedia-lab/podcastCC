@@ -7,9 +7,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: podcastcc
     volumes:
-      - podcastcc_db_data:/var/lib/postgresql/data
+      - podcastcc_compose_db_data:/var/lib/postgresql/data
     networks:
-      - podcastcc
+      - podcastcc-compose
 
   app:
     build: .
@@ -19,7 +19,7 @@ services:
     env_file:
       - .env
     networks:
-      - podcastcc
+      - podcastcc-compose
 
   migrate:
     # Targets the "builder" stage, not the final lean "runner" image, because
@@ -34,7 +34,7 @@ services:
     env_file:
       - .env
     networks:
-      - podcastcc
+      - podcastcc-compose
 
   caddy:
     image: caddy:2-alpine
@@ -48,13 +48,13 @@ services:
       - "${CADDY_HTTPS_PORT:-443}:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - podcastcc_caddy_data:/data
+      - podcastcc_compose_caddy_data:/data
     networks:
-      - podcastcc
+      - podcastcc-compose
 
 networks:
-  podcastcc:
+  podcastcc-compose:
 
 volumes:
-  podcastcc_db_data:
-  podcastcc_caddy_data:
+  podcastcc_compose_db_data:
+  podcastcc_compose_caddy_data:
