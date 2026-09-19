@@ -7,7 +7,7 @@ import {
   deleteStoryboardFrameAction,
   moveStoryboardFrameAction,
 } from "./actions";
-import { AiStoryboardImageAssist } from "./ai-storyboard-image-assist";
+import { AiStoryboardPromptAssist } from "./ai-storyboard-prompt-assist";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import {
   BUTTON_DANGER,
@@ -54,7 +54,7 @@ export default async function StoryboardPage({
       />
       <h1 className={H1}>Storyboard: {project.title}</h1>
 
-      <AiStoryboardImageAssist projectId={projectId} />
+      <AiStoryboardPromptAssist />
 
       <ol className={CARD_LIST}>
         {items.map((item, index) => (
