@@ -295,6 +295,7 @@ model Project {
   id                String                  @id @default(cuid())
   title             String
   stage             ProjectStage            @default(IDE)
+  driveFolderUrl    String?
   roles             ProjectRole[]
   scriptBreakdowns  ScriptBreakdown[]
   storyboardFrames  StoryboardFrame[]

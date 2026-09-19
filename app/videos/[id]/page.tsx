@@ -7,6 +7,7 @@ import { STAGE_ORDER, STAGE_LABELS } from "../stages";
 import { updateProjectStageAction, deleteProjectAction } from "../actions";
 import { ProjectStageBadge } from "@/components/ui/ProjectStageBadge";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { DriveFolderNotice } from "@/components/ui/DriveFolderNotice";
 import { BUTTON_DANGER, BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, H1, INPUT, LABEL, PAGE_WIDE } from "@/lib/ui-classes";
 
 export default async function ProjectDetailPage({
@@ -93,6 +94,10 @@ export default async function ProjectDetailPage({
                 Peran Tim
               </Link>
             )}
+          </div>
+
+          <div className="mt-4">
+            <DriveFolderNotice driveFolderUrl={project.driveFolderUrl} />
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">

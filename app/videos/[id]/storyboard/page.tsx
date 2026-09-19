@@ -9,6 +9,7 @@ import {
 } from "./actions";
 import { AiStoryboardPromptAssist } from "./ai-storyboard-prompt-assist";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { DriveFolderNotice } from "@/components/ui/DriveFolderNotice";
 import {
   BUTTON_DANGER,
   BUTTON_GHOST,
@@ -53,6 +54,8 @@ export default async function StoryboardPage({
         ]}
       />
       <h1 className={H1}>Storyboard: {project.title}</h1>
+
+      <DriveFolderNotice driveFolderUrl={project.driveFolderUrl} />
 
       <AiStoryboardPromptAssist />
 
