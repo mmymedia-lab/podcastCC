@@ -52,8 +52,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ shots });
   } catch (error) {
     if (error instanceof GeminiConfigError || error instanceof GeminiRequestError) {
-      return NextResponse.json({ error: error.message }, { status: 502 });
+      return NextResponse.json({ error: error.message }, { status: 422 });
     }
-    return NextResponse.json({ error: "Gagal membuat draft shot list." }, { status: 500 });
+    return NextResponse.json({ error: "Gagal membuat draft shot list." }, { status: 422 });
   }
 }

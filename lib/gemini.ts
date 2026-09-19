@@ -6,6 +6,14 @@ const DEFAULT_MODEL = "gemini-3.6-flash";
 export class GeminiConfigError extends Error {}
 export class GeminiRequestError extends Error {}
 
+// Callers (app/api/ai/*/route.ts) must NOT map these to a 5xx status.
+// Behind Cloudflare Tunnel, 502/504/500 responses get their body replaced
+// with Cloudflare's own HTML error page before reaching the browser,
+// which breaks the client's response.json() and hides the real message
+// (confirmed by comparing a direct in-container call, which got the JSON
+// through fine, against the same request via the public domain, which
+// didn't). Use a 4xx status (422) instead so the body passes through.
+
 /**
  * Thin wrapper over the Gemini REST API. Never called from the client —
  * the API key stays server-side (see PRD.md: credentials in .env, never
