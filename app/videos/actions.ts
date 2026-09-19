@@ -7,6 +7,7 @@ import { requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { ProjectStage } from "@prisma/client";
 import { STAGE_ORDER } from "./stages";
+import { createProjectDriveFolder } from "@/lib/google-drive";
 
 function requireTitle(raw: FormDataEntryValue | null): string {
   if (typeof raw !== "string" || !raw.trim()) {
@@ -26,9 +27,13 @@ async function requireExistingProjectStage(id: string): Promise<ProjectStage> {
 export async function createProjectAction(formData: FormData) {
   await requireSession();
 
-  const project = await prisma.project.create({
-    data: { title: requireTitle(formData.get("title")) },
-  });
+  const title = requireTitle(formData.get("title"));
+  const project = await prisma.project.create({ data: { title } });
+
+  const driveFolderUrl = await createProjectDriveFolder(title);
+  if (driveFolderUrl) {
+    await prisma.project.update({ where: { id: project.id }, data: { driveFolderUrl } });
+  }
 
   revalidatePath("/videos");
   redirect(`/videos/${project.id}`);
