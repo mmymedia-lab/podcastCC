@@ -10,6 +10,7 @@ import {
 import { AiStoryboardPromptAssist } from "./ai-storyboard-prompt-assist";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { DriveFolderNotice } from "@/components/ui/DriveFolderNotice";
+import { StoryboardFramePreview } from "@/components/ui/StoryboardFramePreview";
 import {
   BUTTON_DANGER,
   BUTTON_GHOST,
@@ -63,14 +64,7 @@ export default async function StoryboardPage({
         {items.map((item, index) => (
           <li key={item.id} className={CARD}>
             <p className="font-medium text-slate-900">Shot {index + 1}</p>
-            <a
-              href={item.driveUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-1 block break-all text-sm text-primary-700 hover:underline"
-            >
-              {item.driveUrl}
-            </a>
+            <StoryboardFramePreview driveUrl={item.driveUrl} />
             {item.notes && <p className="mt-1 text-sm text-slate-600">{item.notes}</p>}
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <form action={moveStoryboardFrameAction.bind(null, projectId, item.id, "up")}>
