@@ -9,6 +9,11 @@
 
 export const PAGE = "mx-auto max-w-3xl px-4 py-8 sm:px-6";
 export const PAGE_WIDE = "mx-auto max-w-5xl px-4 py-8 sm:px-6";
+// For dense, multi-column layouts (e.g. the Kanban board) that need more
+// room than PAGE_WIDE's 1024px cap — wide enough that a typical laptop
+// screen doesn't have to horizontally scroll, capped so it doesn't stretch
+// unreasonably on ultra-wide monitors.
+export const PAGE_FULL = "mx-auto max-w-[1800px] px-4 py-8 sm:px-6";
 
 export const H1 = "mt-2 mb-6 text-2xl font-semibold tracking-tight text-slate-900";
 export const H2 = "mt-8 mb-3 text-lg font-semibold text-slate-900";

@@ -6,7 +6,7 @@ import { STAGE_LABELS, STAGE_ORDER } from "../episodes/stages";
 import { STAGE_TO_PHASE } from "../episodes/phases";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { PhaseLegend } from "@/components/ui/PhaseLegend";
-import { H1, PAGE_WIDE } from "@/lib/ui-classes";
+import { H1, PAGE_FULL } from "@/lib/ui-classes";
 import { KanbanBoard, type EpisodeCardData, type KanbanColumn } from "./kanban-board";
 
 function formatRecordingDate(date: Date | null): string | null {
@@ -70,7 +70,7 @@ export default async function BoardPage() {
   }));
 
   return (
-    <main className={PAGE_WIDE}>
+    <main className={PAGE_FULL}>
       <Breadcrumb items={[{ label: "Beranda", href: "/dashboard" }, { label: "Board" }]} />
       <h1 className={H1}>Board</h1>
       <KanbanBoard initialColumns={columns} />
