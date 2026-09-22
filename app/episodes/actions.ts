@@ -77,4 +77,5 @@ export async function updateEpisodeStageAction(episodeId: string, formData: Form
 
   revalidatePath(`/episodes/${episodeId}`);
   revalidatePath("/episodes");
+  revalidatePath("/board");
 }
