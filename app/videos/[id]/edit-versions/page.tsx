@@ -100,34 +100,36 @@ export default async function EditVersionsPage({
 
       <h2 className={H2}>Tambah Versi</h2>
       <form action={createEditVersionAction.bind(null, projectId)} className={FORM}>
-        <div className={FIELD_GROUP}>
-          <label htmlFor="stage" className={LABEL}>
-            Tahap
-          </label>
-          <select id="stage" name="stage" required className={INPUT}>
-            {EDIT_VERSION_STAGE_ORDER.map((stage) => (
-              <option key={stage} value={stage}>
-                {EDIT_VERSION_STAGE_LABELS[stage]}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className={FIELD_GROUP}>
-          <label htmlFor="driveUrl" className={LABEL}>
-            Link Google Drive
-          </label>
-          <input
-            id="driveUrl"
-            name="driveUrl"
-            type="url"
-            placeholder="https://drive.google.com/..."
-            required
-            className={INPUT}
-          />
-        </div>
-        <button type="submit" className={BUTTON_PRIMARY}>
-          Tambah
-        </button>
+        <fieldset disabled={!pascaProduksiGate.unlocked}>
+          <div className={FIELD_GROUP}>
+            <label htmlFor="stage" className={LABEL}>
+              Tahap
+            </label>
+            <select id="stage" name="stage" required className={INPUT}>
+              {EDIT_VERSION_STAGE_ORDER.map((stage) => (
+                <option key={stage} value={stage}>
+                  {EDIT_VERSION_STAGE_LABELS[stage]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={FIELD_GROUP}>
+            <label htmlFor="driveUrl" className={LABEL}>
+              Link Google Drive
+            </label>
+            <input
+              id="driveUrl"
+              name="driveUrl"
+              type="url"
+              placeholder="https://drive.google.com/..."
+              required
+              className={INPUT}
+            />
+          </div>
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Tambah
+          </button>
+        </fieldset>
       </form>
     </main>
   );

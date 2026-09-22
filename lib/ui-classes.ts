@@ -24,7 +24,8 @@ export const CARD_LIST = "space-y-3";
 export const LABEL = "mb-1 block text-sm font-medium text-slate-700";
 export const INPUT =
   "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 " +
-  "placeholder:text-slate-400 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30";
+  "placeholder:text-slate-400 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30 " +
+  "disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400";
 export const TEXTAREA = INPUT + " min-h-[6rem] resize-y";
 export const FIELD_GROUP = "mb-4";
 export const HELP_TEXT = "mt-1 text-xs text-slate-500";

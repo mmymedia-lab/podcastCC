@@ -18,11 +18,13 @@ export function ShowNotesForm({
   initialDraft,
   initialExternalUrl,
   outlineText,
+  locked,
 }: {
   episodeId: string;
   initialDraft: string;
   initialExternalUrl: string;
   outlineText: string;
+  locked: boolean;
 }) {
   const [draft, setDraft] = useState(initialDraft);
   const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "error">("idle");
@@ -53,60 +55,62 @@ export function ShowNotesForm({
 
   return (
     <form action={updateShowNotesAction.bind(null, episodeId)} className={FORM}>
-      <div className={FIELD_GROUP}>
-        <label htmlFor="draft" className={LABEL}>
-          Draft show notes
-        </label>
-        <div className="mb-2 rounded-lg border border-primary-100 bg-primary-50 p-3">
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setDraft(outlineText)}
-              disabled={!outlineText}
-              className={BUTTON_SECONDARY}
-            >
-              Isi dari Outline
-            </button>
-            <button
-              type="button"
-              onClick={requestAiDraft}
-              disabled={aiStatus === "loading"}
-              className={BUTTON_PRIMARY}
-            >
-              {aiStatus === "loading" ? "Membuat draft..." : "Draft dengan AI"}
-            </button>
-            {draft && <CopyButton text={draft} />}
+      <fieldset disabled={locked}>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="draft" className={LABEL}>
+            Draft show notes
+          </label>
+          <div className="mb-2 rounded-lg border border-primary-100 bg-primary-50 p-3">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setDraft(outlineText)}
+                disabled={locked || !outlineText}
+                className={BUTTON_SECONDARY}
+              >
+                Isi dari Outline
+              </button>
+              <button
+                type="button"
+                onClick={requestAiDraft}
+                disabled={locked || aiStatus === "loading"}
+                className={BUTTON_PRIMARY}
+              >
+                {aiStatus === "loading" ? "Membuat draft..." : "Draft dengan AI"}
+              </button>
+              {draft && <CopyButton text={draft} />}
+            </div>
+            {aiStatus === "error" && (
+              <p role="alert" className="mt-2 text-sm text-danger-700">
+                {aiError} — kamu tetap bisa isi/edit draft manual di bawah.
+              </p>
+            )}
           </div>
-          {aiStatus === "error" && (
-            <p role="alert" className="mt-2 text-sm text-danger-700">
-              {aiError} — kamu tetap bisa isi/edit draft manual di bawah.
-            </p>
-          )}
+          <textarea
+            id="draft"
+            name="draft"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            rows={10}
+            className={TEXTAREA}
+          />
         </div>
-        <textarea
-          id="draft"
-          name="draft"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          rows={10}
-          className={TEXTAREA}
-        />
-      </div>
-      <div className={FIELD_GROUP}>
-        <label htmlFor="externalUrl" className={LABEL}>
-          Link show notes final (opsional, mis. Google Docs)
-        </label>
-        <input
-          id="externalUrl"
-          name="externalUrl"
-          type="url"
-          defaultValue={initialExternalUrl}
-          className={INPUT}
-        />
-      </div>
-      <button type="submit" className={BUTTON_PRIMARY}>
-        Simpan
-      </button>
+        <div className={FIELD_GROUP}>
+          <label htmlFor="externalUrl" className={LABEL}>
+            Link show notes final (opsional, mis. Google Docs)
+          </label>
+          <input
+            id="externalUrl"
+            name="externalUrl"
+            type="url"
+            defaultValue={initialExternalUrl}
+            className={INPUT}
+          />
+        </div>
+        <button type="submit" className={BUTTON_PRIMARY}>
+          Simpan
+        </button>
+      </fieldset>
     </form>
   );
 }

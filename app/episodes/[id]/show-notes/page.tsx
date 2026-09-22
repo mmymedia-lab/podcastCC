@@ -55,6 +55,7 @@ export default async function ShowNotesPage({
         initialDraft={episode.showNotesDraft ?? ""}
         initialExternalUrl={episode.showNotesExternalUrl ?? ""}
         outlineText={outlineText}
+        locked={!pascaProduksiGate.unlocked}
       />
     </main>
   );
