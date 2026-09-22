@@ -42,6 +42,7 @@ export default async function TimestampsPage({
   const userId = await resolveUserId(session);
   const pascaProduksiGate = await getEpisodePascaProduksiGate(episodeId);
   const canTogglePascaProduksi = userId ? await canUnlockEpisodePascaProduksi(userId, episodeId) : false;
+  const locked = !pascaProduksiGate.unlocked;
 
   return (
     <main className={PAGE}>
@@ -78,7 +79,7 @@ export default async function TimestampsPage({
                 Edit
               </Link>
               <form action={deleteTimestampMarkerAction.bind(null, episodeId, marker.id)}>
-                <button type="submit" className={BUTTON_DANGER}>
+                <button type="submit" disabled={locked} className={BUTTON_DANGER}>
                   Hapus
                 </button>
               </form>
@@ -90,21 +91,23 @@ export default async function TimestampsPage({
 
       <h2 className={H2}>Tambah Timestamp</h2>
       <form action={createTimestampMarkerAction.bind(null, episodeId)} className={FORM}>
-        <div className={FIELD_GROUP}>
-          <label htmlFor="timeLabel" className={LABEL}>
-            Waktu (mis. 00:12:34)
-          </label>
-          <input id="timeLabel" name="timeLabel" placeholder="00:00:00" required className={INPUT} />
-        </div>
-        <div className={FIELD_GROUP}>
-          <label htmlFor="label" className={LABEL}>
-            Label chapter
-          </label>
-          <input id="label" name="label" required className={INPUT} />
-        </div>
-        <button type="submit" className={BUTTON_PRIMARY}>
-          Tambah
-        </button>
+        <fieldset disabled={locked}>
+          <div className={FIELD_GROUP}>
+            <label htmlFor="timeLabel" className={LABEL}>
+              Waktu (mis. 00:12:34)
+            </label>
+            <input id="timeLabel" name="timeLabel" placeholder="00:00:00" required className={INPUT} />
+          </div>
+          <div className={FIELD_GROUP}>
+            <label htmlFor="label" className={LABEL}>
+              Label chapter
+            </label>
+            <input id="label" name="label" required className={INPUT} />
+          </div>
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Tambah
+          </button>
+        </fieldset>
       </form>
     </main>
   );

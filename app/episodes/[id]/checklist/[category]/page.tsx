@@ -46,6 +46,7 @@ export default async function ChecklistPage({
   const pascaProduksiGate = category === "POST_PRODUCTION" ? await getEpisodePascaProduksiGate(episodeId) : null;
   const canTogglePascaProduksi =
     pascaProduksiGate && userId ? await canUnlockEpisodePascaProduksi(userId, episodeId) : false;
+  const locked = pascaProduksiGate ? !pascaProduksiGate.unlocked : false;
 
   return (
     <main className={PAGE}>
@@ -78,6 +79,7 @@ export default async function ChecklistPage({
             <form action={toggleChecklistItemAction.bind(null, episodeId, slug, item.id)}>
               <button
                 type="submit"
+                disabled={locked}
                 aria-pressed={item.isDone}
                 aria-label={
                   item.isDone
@@ -97,7 +99,7 @@ export default async function ChecklistPage({
               {item.label}
             </span>
             <form action={deleteChecklistItemAction.bind(null, episodeId, slug, item.id)}>
-              <button type="submit" className={BUTTON_DANGER}>
+              <button type="submit" disabled={locked} className={BUTTON_DANGER}>
                 Hapus
               </button>
             </form>
@@ -108,15 +110,17 @@ export default async function ChecklistPage({
 
       <h2 className={H2}>Tambah Item</h2>
       <form action={createChecklistItemAction.bind(null, episodeId, category, slug)} className={FORM}>
-        <div className={FIELD_GROUP}>
-          <label htmlFor="label" className={LABEL}>
-            Item
-          </label>
-          <input id="label" name="label" required className={INPUT} />
-        </div>
-        <button type="submit" className={BUTTON_PRIMARY}>
-          Tambah
-        </button>
+        <fieldset disabled={locked}>
+          <div className={FIELD_GROUP}>
+            <label htmlFor="label" className={LABEL}>
+              Item
+            </label>
+            <input id="label" name="label" required className={INPUT} />
+          </div>
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Tambah
+          </button>
+        </fieldset>
       </form>
     </main>
   );

@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { canUnlockProjectPascaProduksi, getProjectPascaProduksiGate } from "@/lib/permissions";
 import { deleteEditVersionAction, updateApprovalStatusAction } from "../actions";
 import { createRevisionNoteAction, deleteRevisionNoteAction, toggleRevisionNoteResolvedAction } from "./actions";
+import { lockProjectPascaProduksiAction, unlockProjectPascaProduksiAction } from "@/app/videos/actions";
 import { APPROVAL_STATUS_LABELS, APPROVAL_STATUS_ORDER, EDIT_VERSION_STAGE_LABELS } from "../stages";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { PascaProduksiGateNotice } from "@/components/ui/PascaProduksiGateNotice";
 import {
   BUTTON_DANGER,
   BUTTON_GHOST,
@@ -25,7 +28,7 @@ export default async function EditVersionDetailPage({
 }: {
   params: Promise<{ id: string; versionId: string }>;
 }) {
-  await requireSession();
+  const session = await requireSession();
   const { id: projectId, versionId } = await params;
 
   const version = await prisma.editVersion.findUnique({ where: { id: versionId } });
@@ -39,6 +42,11 @@ export default async function EditVersionDetailPage({
     orderBy: { createdAt: "desc" },
   });
 
+  const userId = await resolveUserId(session);
+  const pascaProduksiGate = await getProjectPascaProduksiGate(projectId);
+  const canTogglePascaProduksi = userId ? await canUnlockProjectPascaProduksi(userId, projectId) : false;
+  const locked = !pascaProduksiGate.unlocked;
+
   return (
     <main className={PAGE_WIDE}>
       <Breadcrumb
@@ -51,6 +59,15 @@ export default async function EditVersionDetailPage({
         ]}
       />
       <h1 className={H1}>{EDIT_VERSION_STAGE_LABELS[version.stage]}</h1>
+
+      <PascaProduksiGateNotice
+        unlocked={pascaProduksiGate.unlocked}
+        productionDate={pascaProduksiGate.productionDate}
+        manualOverride={pascaProduksiGate.manualOverride}
+        canToggle={canTogglePascaProduksi}
+        unlockAction={unlockProjectPascaProduksiAction.bind(null, projectId)}
+        lockAction={lockProjectPascaProduksiAction.bind(null, projectId)}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className={CARD}>
@@ -68,28 +85,30 @@ export default async function EditVersionDetailPage({
             action={updateApprovalStatusAction.bind(null, projectId, version.id)}
             className="mt-4"
           >
-            <label htmlFor="approvalStatus" className={LABEL}>
-              Status Approval
-            </label>
-            <select
-              id="approvalStatus"
-              name="approvalStatus"
-              defaultValue={version.approvalStatus}
-              className={`${INPUT} mb-3`}
-            >
-              {APPROVAL_STATUS_ORDER.map((status) => (
-                <option key={status} value={status}>
-                  {APPROVAL_STATUS_LABELS[status]}
-                </option>
-              ))}
-            </select>
-            <button type="submit" className={BUTTON_PRIMARY}>
-              Simpan
-            </button>
+            <fieldset disabled={locked}>
+              <label htmlFor="approvalStatus" className={LABEL}>
+                Status Approval
+              </label>
+              <select
+                id="approvalStatus"
+                name="approvalStatus"
+                defaultValue={version.approvalStatus}
+                className={`${INPUT} mb-3`}
+              >
+                {APPROVAL_STATUS_ORDER.map((status) => (
+                  <option key={status} value={status}>
+                    {APPROVAL_STATUS_LABELS[status]}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className={BUTTON_PRIMARY}>
+                Simpan
+              </button>
+            </fieldset>
           </form>
 
           <form action={deleteEditVersionAction.bind(null, projectId, version.id)} className="mt-4">
-            <button type="submit" className={BUTTON_DANGER}>
+            <button type="submit" disabled={locked} className={BUTTON_DANGER}>
               Hapus Versi
             </button>
           </form>
@@ -108,12 +127,12 @@ export default async function EditVersionDetailPage({
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <form action={toggleRevisionNoteResolvedAction.bind(null, projectId, versionId, note.id)}>
-                    <button type="submit" className={BUTTON_GHOST}>
+                    <button type="submit" disabled={locked} className={BUTTON_GHOST}>
                       {note.resolved ? "Tandai Belum Selesai" : "Tandai Selesai"}
                     </button>
                   </form>
                   <form action={deleteRevisionNoteAction.bind(null, projectId, versionId, note.id)}>
-                    <button type="submit" className={BUTTON_DANGER}>
+                    <button type="submit" disabled={locked} className={BUTTON_DANGER}>
                       Hapus
                     </button>
                   </form>
@@ -127,15 +146,17 @@ export default async function EditVersionDetailPage({
             action={createRevisionNoteAction.bind(null, projectId, versionId)}
             className={`${FORM} mt-4`}
           >
-            <div className={FIELD_GROUP}>
-              <label htmlFor="content" className={LABEL}>
-                Catatan Revisi
-              </label>
-              <input id="content" name="content" required className={INPUT} />
-            </div>
-            <button type="submit" className={BUTTON_PRIMARY}>
-              Tambah
-            </button>
+            <fieldset disabled={locked}>
+              <div className={FIELD_GROUP}>
+                <label htmlFor="content" className={LABEL}>
+                  Catatan Revisi
+                </label>
+                <input id="content" name="content" required className={INPUT} />
+              </div>
+              <button type="submit" className={BUTTON_PRIMARY}>
+                Tambah
+              </button>
+            </fieldset>
           </form>
         </div>
       </div>
