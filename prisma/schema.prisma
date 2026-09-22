@@ -87,6 +87,12 @@ model Episode {
   title                String
   stage                EpisodeStage      @default(BANK_TEMA)
   recordingScheduledAt DateTime?
+  // Manual early-unlock for Pasca-Produksi (Checklist Pasca-Produksi,
+  // Timestamp, Show Notes) — normally that stage only opens once
+  // recordingScheduledAt's date has passed (see
+  // getEpisodePascaProduksiGate() in lib/permissions.ts); this lets Super
+  // Admin or this episode's Leader Produksi open it early.
+  pascaProduksiUnlocked Boolean          @default(false)
   hostId               String?
   host                 Host?             @relation(fields: [hostId], references: [id], onDelete: SetNull)
   // Which rundown segment Mode Eksekusi is currently showing, and when it
@@ -306,6 +312,12 @@ model Project {
   // trashed via the Drive API on project deletion without having to parse
   // it back out of a URL — see lib/google-drive.ts.
   driveFolderId     String?
+  // Manual early-unlock for Pasca-Produksi (Edit Version & Revisi) —
+  // normally that stage only opens once the latest ShootingDay's
+  // scheduledDate has passed (see getProjectPascaProduksiGate() in
+  // lib/permissions.ts); this lets Super Admin or this project's Leader
+  // Produksi Video open it early.
+  pascaProduksiUnlocked Boolean               @default(false)
   roles             ProjectRole[]
   scriptBreakdowns  ScriptBreakdown[]
   storyboardFrames  StoryboardFrame[]

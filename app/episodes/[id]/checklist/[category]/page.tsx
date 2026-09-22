@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { canUnlockEpisodePascaProduksi, getEpisodePascaProduksiGate } from "@/lib/permissions";
 import { CHECKLIST_CATEGORY_LABELS, slugToCategory } from "../categories";
 import { createChecklistItemAction, deleteChecklistItemAction, toggleChecklistItemAction } from "../actions";
+import { lockEpisodePascaProduksiAction, unlockEpisodePascaProduksiAction } from "@/app/episodes/actions";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { PascaProduksiGateNotice } from "@/components/ui/PascaProduksiGateNotice";
 import {
   BUTTON_DANGER,
   BUTTON_GHOST,
@@ -25,7 +28,7 @@ export default async function ChecklistPage({
 }: {
   params: Promise<{ id: string; category: string }>;
 }) {
-  await requireSession();
+  const session = await requireSession();
   const { id: episodeId, category: slug } = await params;
 
   const category = slugToCategory(slug);
@@ -38,6 +41,11 @@ export default async function ChecklistPage({
     where: { episodeId, category },
     orderBy: { order: "asc" },
   });
+
+  const userId = await resolveUserId(session);
+  const pascaProduksiGate = category === "POST_PRODUCTION" ? await getEpisodePascaProduksiGate(episodeId) : null;
+  const canTogglePascaProduksi =
+    pascaProduksiGate && userId ? await canUnlockEpisodePascaProduksi(userId, episodeId) : false;
 
   return (
     <main className={PAGE}>
@@ -52,6 +60,17 @@ export default async function ChecklistPage({
       <h1 className={H1}>
         {CHECKLIST_CATEGORY_LABELS[category]}: {episode.title}
       </h1>
+
+      {pascaProduksiGate && (
+        <PascaProduksiGateNotice
+          unlocked={pascaProduksiGate.unlocked}
+          productionDate={pascaProduksiGate.productionDate}
+          manualOverride={pascaProduksiGate.manualOverride}
+          canToggle={canTogglePascaProduksi}
+          unlockAction={unlockEpisodePascaProduksiAction.bind(null, episodeId)}
+          lockAction={lockEpisodePascaProduksiAction.bind(null, episodeId)}
+        />
+      )}
 
       <ul className={CARD_LIST}>
         {items.map((item) => (

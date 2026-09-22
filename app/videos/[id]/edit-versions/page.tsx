@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { canUnlockProjectPascaProduksi, getProjectPascaProduksiGate } from "@/lib/permissions";
 import { createEditVersionAction } from "./actions";
+import { lockProjectPascaProduksiAction, unlockProjectPascaProduksiAction } from "@/app/videos/actions";
 import { EDIT_VERSION_STAGE_LABELS, EDIT_VERSION_STAGE_ORDER } from "./stages";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { PascaProduksiGateNotice } from "@/components/ui/PascaProduksiGateNotice";
 import {
   BUTTON_PRIMARY,
   CARD,
@@ -30,7 +33,7 @@ export default async function EditVersionsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireSession();
+  const session = await requireSession();
   const { id: projectId } = await params;
 
   const project = await prisma.project.findUnique({ where: { id: projectId } });
@@ -41,6 +44,10 @@ export default async function EditVersionsPage({
     orderBy: { order: "asc" },
     include: { _count: { select: { revisionNotes: true } } },
   });
+
+  const userId = await resolveUserId(session);
+  const pascaProduksiGate = await getProjectPascaProduksiGate(projectId);
+  const canTogglePascaProduksi = userId ? await canUnlockProjectPascaProduksi(userId, projectId) : false;
 
   return (
     <main className={PAGE}>
@@ -53,6 +60,15 @@ export default async function EditVersionsPage({
         ]}
       />
       <h1 className={H1}>Edit Version: {project.title}</h1>
+
+      <PascaProduksiGateNotice
+        unlocked={pascaProduksiGate.unlocked}
+        productionDate={pascaProduksiGate.productionDate}
+        manualOverride={pascaProduksiGate.manualOverride}
+        canToggle={canTogglePascaProduksi}
+        unlockAction={unlockProjectPascaProduksiAction.bind(null, projectId)}
+        lockAction={lockProjectPascaProduksiAction.bind(null, projectId)}
+      />
 
       <ol className={CARD_LIST}>
         {versions.map((version, index) => (

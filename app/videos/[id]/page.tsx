@@ -1,13 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
+import { canUnlockProjectPascaProduksi, getProjectPascaProduksiGate } from "@/lib/permissions";
 import { STAGE_ORDER, STAGE_LABELS } from "../stages";
-import { updateProjectStageAction, deleteProjectAction } from "../actions";
+import {
+  deleteProjectAction,
+  lockProjectPascaProduksiAction,
+  unlockProjectPascaProduksiAction,
+  updateProjectStageAction,
+} from "../actions";
 import { ProjectStageBadge } from "@/components/ui/ProjectStageBadge";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { DriveFolderNotice } from "@/components/ui/DriveFolderNotice";
+import { PascaProduksiGateNotice } from "@/components/ui/PascaProduksiGateNotice";
 import { BUTTON_DANGER, BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, H1, INPUT, LABEL, PAGE_WIDE } from "@/lib/ui-classes";
 
 export default async function ProjectDetailPage({
@@ -15,13 +22,17 @@ export default async function ProjectDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireSession();
+  const session = await requireSession();
   const { id } = await params;
 
   const project = await prisma.project.findUnique({ where: { id } });
   if (!project) notFound();
 
   const settings = await getWorkspaceSettings();
+
+  const userId = await resolveUserId(session);
+  const pascaProduksiGate = await getProjectPascaProduksiGate(id);
+  const canTogglePascaProduksi = userId ? await canUnlockProjectPascaProduksi(userId, id) : false;
 
   return (
     <main className={PAGE_WIDE}>
@@ -75,6 +86,14 @@ export default async function ProjectDetailPage({
           </div>
 
           <p className="mb-3 mt-4 text-sm font-medium text-slate-700">Pasca-Produksi</p>
+          <PascaProduksiGateNotice
+            unlocked={pascaProduksiGate.unlocked}
+            productionDate={pascaProduksiGate.productionDate}
+            manualOverride={pascaProduksiGate.manualOverride}
+            canToggle={canTogglePascaProduksi}
+            unlockAction={unlockProjectPascaProduksiAction.bind(null, project.id)}
+            lockAction={lockProjectPascaProduksiAction.bind(null, project.id)}
+          />
           <div className="flex flex-wrap gap-2">
             <Link href={`/videos/${project.id}/edit-versions`} className={BUTTON_SECONDARY}>
               Edit Version & Revisi
