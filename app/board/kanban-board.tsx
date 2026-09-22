@@ -135,7 +135,7 @@ function Column({
   const { setNodeRef, isOver } = useDroppable({ id: column.stage });
 
   return (
-    <div className="w-64 shrink-0 rounded-lg bg-slate-50 shadow-sm">
+    <div className="min-w-0 rounded-lg bg-slate-50 shadow-sm">
       <div
         className={`sticky top-0 flex items-center justify-between rounded-t-md border-t-4 px-3 py-2 ${PHASE_BORDER_STYLE[column.phase]} ${COLUMN_BG_STYLE[column.phase]}`}
       >
@@ -243,7 +243,7 @@ export function KanbanBoard({ initialColumns }: { initialColumns: KanbanColumn[]
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4">
           {columns.map((column) => (
             <Column key={column.stage} column={column} onMove={moveEpisode} />
           ))}
