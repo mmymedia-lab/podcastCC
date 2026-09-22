@@ -47,7 +47,8 @@ export async function createUserAction(formData: FormData) {
 }
 
 export async function updateUserAction(id: string, formData: FormData) {
-  await requireSession();
+  const session = await requireSession();
+  const currentUserId = await resolveUserId(session);
 
   const email = requireEmail(formData.get("email"));
   const name = optionalName(formData.get("name"));
@@ -59,6 +60,16 @@ export async function updateUserAction(id: string, formData: FormData) {
       throw new Error("Password minimal 8 karakter.");
     }
     data.passwordHash = await bcrypt.hash(password, 10);
+  }
+
+  // Only an existing super admin may grant/revoke isSuperAdmin — checked
+  // server-side (not just by hiding the checkbox) so a non-admin can't
+  // grant it to themselves via a hand-crafted form submission.
+  const currentUser = currentUserId
+    ? await prisma.user.findUnique({ where: { id: currentUserId } })
+    : null;
+  if (currentUser?.isSuperAdmin) {
+    data.isSuperAdmin = formData.get("isSuperAdmin") === "on";
   }
 
   try {

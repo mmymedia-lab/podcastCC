@@ -3,11 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
-import { requireEditableProjectStage } from "@/lib/permissions";
+import { requireCanDeleteProject, requireEditableProjectStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { ProjectStage } from "@prisma/client";
 import { STAGE_ORDER } from "./stages";
-import { createProjectDriveFolder } from "@/lib/google-drive";
+import { createProjectDriveFolder, deleteProjectDriveFolder } from "@/lib/google-drive";
 
 function requireTitle(raw: FormDataEntryValue | null): string {
   if (typeof raw !== "string" || !raw.trim()) {
@@ -30,9 +30,12 @@ export async function createProjectAction(formData: FormData) {
   const title = requireTitle(formData.get("title"));
   const project = await prisma.project.create({ data: { title } });
 
-  const driveFolderUrl = await createProjectDriveFolder(title);
-  if (driveFolderUrl) {
-    await prisma.project.update({ where: { id: project.id }, data: { driveFolderUrl } });
+  const driveFolder = await createProjectDriveFolder(title);
+  if (driveFolder) {
+    await prisma.project.update({
+      where: { id: project.id },
+      data: { driveFolderId: driveFolder.id, driveFolderUrl: driveFolder.url },
+    });
   }
 
   revalidatePath("/videos");
@@ -72,7 +75,15 @@ export async function updateProjectStageAction(id: string, formData: FormData) {
 }
 
 export async function deleteProjectAction(id: string) {
-  await requireEditableProjectStage(id, await requireExistingProjectStage(id));
+  await requireCanDeleteProject(id);
+
+  const project = await prisma.project.findUnique({ where: { id } });
+  if (!project) throw new Error("Proyek tidak ditemukan.");
+
+  if (project.driveFolderId) {
+    await deleteProjectDriveFolder(project.driveFolderId);
+  }
+
   await prisma.project.delete({ where: { id } });
   revalidatePath("/videos");
   redirect("/videos");

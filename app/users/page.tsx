@@ -39,6 +39,11 @@ export default async function UsersPage() {
                   {user.id === currentUserId && (
                     <span className="ml-2 text-xs font-normal text-slate-400">(kamu)</span>
                   )}
+                  {user.isSuperAdmin && (
+                    <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                      Super Admin
+                    </span>
+                  )}
                 </p>
                 <p className="text-sm text-slate-500">{user.email}</p>
               </div>

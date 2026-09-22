@@ -14,13 +14,22 @@ async function main() {
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    console.log(`User ${email} already exists — skipping.`);
+    // Re-run on an already-seeded install (e.g. after upgrading to the
+    // isSuperAdmin field) still needs to grant this — without it, a
+    // pre-existing install would have no super admin at all and nobody
+    // could delete a Tim-mode project (see canDeleteProject()).
+    if (!existing.isSuperAdmin) {
+      await prisma.user.update({ where: { email }, data: { isSuperAdmin: true } });
+      console.log(`Granted isSuperAdmin to existing user ${email}.`);
+    } else {
+      console.log(`User ${email} already exists — skipping.`);
+    }
     return;
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.create({ data: { email, passwordHash } });
-  console.log(`Created bootstrap user ${email}.`);
+  await prisma.user.create({ data: { email, passwordHash, isSuperAdmin: true } });
+  console.log(`Created bootstrap super admin user ${email}.`);
 }
 
 main()
