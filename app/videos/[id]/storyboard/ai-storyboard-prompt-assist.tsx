@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CopyButton } from "@/components/ui/CopyButton";
-import { BUTTON_PRIMARY, BUTTON_SECONDARY, LABEL, TEXTAREA } from "@/lib/ui-classes";
+import { BUTTON_PRIMARY, BUTTON_SECONDARY, HELP_TEXT, LABEL, TEXTAREA } from "@/lib/ui-classes";
 
 const GEMINI_URL = "https://gemini.google.com/app";
 
@@ -13,13 +13,21 @@ const GEMINI_URL = "https://gemini.google.com/app";
 // (no Gemini API call) since this only produces a prompt for the user to
 // paste into Gemini themselves — see the milestone that replaced in-app
 // image generation with this copy-a-prompt flow.
+//
+// Faceless by design: any person in the scene is framed so no face is
+// shown at all (back view / over-the-shoulder / silhouette), not just
+// "not photorealistic" — standard storyboard techniques for conveying a
+// scene through gesture, posture, and blocking without depicting a face.
 function buildStoryboardPrompt(description: string): string {
   return (
     `Gambarkan satu panel storyboard bergaya sketsa pensil kasar hitam-putih ` +
     `(rough pencil sketch, bukan render realistis berwarna), untuk adegan berikut: ` +
-    `"${description}". Sertakan anotasi panah sederhana untuk arah gerakan kamera atau ` +
-    `subjek jika relevan pada adegan tersebut. Fokus pada komposisi, framing, dan blocking, ` +
-    `bukan detail wajah/tekstur yang realistis. Rasio aspek 16:9.`
+    `"${description}". Gaya faceless: kalau ada sosok orang di adegan ini, gambarkan tanpa ` +
+    `wajah sama sekali — pakai sudut pandang dari belakang (back view), over-the-shoulder, ` +
+    `atau siluet/backlighting — bukan wajah yang disamarkan/blur, tapi memang tidak terlihat ` +
+    `atau tidak digambar. Ceritakan adegan lewat gesture, postur tubuh, blocking, dan komposisi, ` +
+    `bukan ekspresi wajah. Sertakan anotasi panah sederhana untuk arah gerakan kamera atau ` +
+    `subjek jika relevan. Rasio aspek 16:9.`
   );
 }
 
@@ -29,7 +37,10 @@ export function AiStoryboardPromptAssist() {
 
   return (
     <div className="mb-4 rounded-lg border border-primary-100 bg-primary-50 p-4">
-      <h2 className="mb-2 text-sm font-semibold text-primary-800">Bantuan AI: Prompt Storyboard</h2>
+      <h2 className="mb-1 text-sm font-semibold text-primary-800">Bantuan AI: Prompt Storyboard</h2>
+      <p className={`${HELP_TEXT} mb-2`}>
+        Gaya faceless — sosok orang digambarkan tanpa wajah (dari belakang/siluet), bukan close-up wajah.
+      </p>
       <label htmlFor="ai-storyboard-description" className={LABEL}>
         Deskripsi adegan
       </label>
