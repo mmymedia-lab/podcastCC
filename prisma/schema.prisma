@@ -31,6 +31,12 @@ model User {
   // Whether this user has dismissed/finished the onboarding wizard at least
   // once. Re-openable anytime from the nav bar regardless of this flag.
   hasSeenOnboarding Boolean       @default(false)
+  // Global override, independent of per-project roles (ProjectRole) — e.g.
+  // may delete any Project regardless of who its Leader Produksi is. See
+  // canDeleteProject() in lib/permissions.ts. Bootstrapped onto ADMIN_EMAIL
+  // by prisma/seed.ts; only an existing super admin can grant it to
+  // someone else (see app/users/actions.ts).
+  isSuperAdmin Boolean       @default(false)
   episodeRoles EpisodeRole[]
   projectRoles ProjectRole[]
   createdAt    DateTime      @default(now())
@@ -296,6 +302,10 @@ model Project {
   title             String
   stage             ProjectStage            @default(IDE)
   driveFolderUrl    String?
+  // The Drive folder's file ID (distinct from driveFolderUrl) so it can be
+  // trashed via the Drive API on project deletion without having to parse
+  // it back out of a URL — see lib/google-drive.ts.
+  driveFolderId     String?
   roles             ProjectRole[]
   scriptBreakdowns  ScriptBreakdown[]
   storyboardFrames  StoryboardFrame[]

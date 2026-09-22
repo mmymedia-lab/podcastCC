@@ -131,3 +131,41 @@ export async function requireEditableProjectStage(projectId: string, stage: Proj
 
   return session;
 }
+
+/**
+ * Whether `userId` may delete `projectId` — deliberately narrower than
+ * canEditProjectStage(): only a super admin (User.isSuperAdmin, a global
+ * override) or that specific project's Leader Produksi Video may delete
+ * it, not the wider set of roles that may edit its stages.
+ *
+ * Same Solo-mode fail-open rule as canEditProjectStage() — Solo mode is a
+ * single user with nothing to protect the project from.
+ */
+export async function canDeleteProject(userId: string, projectId: string): Promise<boolean> {
+  const settings = await prisma.workspaceSettings.findUnique({ where: { id: 1 } });
+  if (!settings || settings.mode === "SOLO") return true;
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (user?.isSuperAdmin) return true;
+
+  const leaderRole = await prisma.projectRole.findFirst({
+    where: { projectId, userId, role: "LEADER_PRODUKSI_VIDEO" },
+  });
+  return leaderRole !== null;
+}
+
+/** Server-action guard combining requireSession() with canDeleteProject(). */
+export async function requireCanDeleteProject(projectId: string) {
+  const session = await requireSession();
+  const userId = await resolveUserId(session);
+  if (!userId) {
+    throw new Error("Sesi tidak valid, silakan login ulang.");
+  }
+
+  const allowed = await canDeleteProject(userId, projectId);
+  if (!allowed) {
+    throw new Error("Hanya Super Admin atau Leader Produksi project ini yang bisa menghapus proyek.");
+  }
+
+  return session;
+}

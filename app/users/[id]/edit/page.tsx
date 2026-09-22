@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { updateUserAction } from "../../actions";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
@@ -21,11 +21,16 @@ export default async function EditUserPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireSession();
+  const session = await requireSession();
   const { id } = await params;
 
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) notFound();
+
+  const currentUserId = await resolveUserId(session);
+  const currentUser = currentUserId
+    ? await prisma.user.findUnique({ where: { id: currentUserId } })
+    : null;
 
   return (
     <main className={PAGE}>
@@ -58,6 +63,22 @@ export default async function EditUserPage({
           <input id="password" name="password" type="password" minLength={8} className={INPUT} />
           <p className={HELP_TEXT}>Kosongkan bila tidak ingin mengubah password.</p>
         </div>
+        {currentUser?.isSuperAdmin && (
+          <div className={FIELD_GROUP}>
+            <label htmlFor="isSuperAdmin" className="flex items-center gap-2 text-sm text-slate-700">
+              <input
+                id="isSuperAdmin"
+                type="checkbox"
+                name="isSuperAdmin"
+                defaultChecked={user.isSuperAdmin}
+              />
+              Super Admin
+            </label>
+            <p className={HELP_TEXT}>
+              Bisa menghapus proyek video apa pun, di luar Leader Produksi project itu sendiri.
+            </p>
+          </div>
+        )}
         <div className="flex gap-2">
           <button type="submit" className={BUTTON_PRIMARY}>
             Simpan

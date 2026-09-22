@@ -4,21 +4,28 @@ vi.mock("./prisma", () => ({
   prisma: {
     workspaceSettings: { findUnique: vi.fn() },
     episodeRole: { findMany: vi.fn() },
-    projectRole: { findMany: vi.fn() },
+    projectRole: { findMany: vi.fn(), findFirst: vi.fn() },
+    user: { findUnique: vi.fn() },
   },
 }));
 
 import { prisma } from "./prisma";
-import { canEditProjectStage, canEditStage } from "./permissions";
+import { canDeleteProject, canEditProjectStage, canEditStage } from "./permissions";
 
 const workspaceSettings = prisma.workspaceSettings as unknown as { findUnique: ReturnType<typeof vi.fn> };
 const episodeRole = prisma.episodeRole as unknown as { findMany: ReturnType<typeof vi.fn> };
-const projectRole = prisma.projectRole as unknown as { findMany: ReturnType<typeof vi.fn> };
+const projectRole = prisma.projectRole as unknown as {
+  findMany: ReturnType<typeof vi.fn>;
+  findFirst: ReturnType<typeof vi.fn>;
+};
+const user = prisma.user as unknown as { findUnique: ReturnType<typeof vi.fn> };
 
 beforeEach(() => {
   workspaceSettings.findUnique.mockReset();
   episodeRole.findMany.mockReset();
   projectRole.findMany.mockReset();
+  projectRole.findFirst.mockReset();
+  user.findUnique.mockReset();
 });
 
 describe("canEditStage", () => {
@@ -149,5 +156,59 @@ describe("canEditProjectStage", () => {
     for (const stage of ["IDE", "PRA_PRODUKSI", "PRODUKSI", "PASCA_PRODUKSI", "DISTRIBUSI"] as const) {
       expect(await canEditProjectStage("user-1", "proj-1", stage)).toBe(true);
     }
+  });
+});
+
+describe("canDeleteProject", () => {
+  it("allows deleting when no workspace settings exist yet", async () => {
+    workspaceSettings.findUnique.mockResolvedValue(null);
+
+    expect(await canDeleteProject("user-1", "proj-1")).toBe(true);
+  });
+
+  it("allows deleting in Solo mode regardless of role", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "SOLO" });
+
+    expect(await canDeleteProject("user-1", "proj-1")).toBe(true);
+    expect(user.findUnique).not.toHaveBeenCalled();
+    expect(projectRole.findFirst).not.toHaveBeenCalled();
+  });
+
+  it("allows a super admin regardless of project role", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
+    user.findUnique.mockResolvedValue({ id: "user-1", isSuperAdmin: true });
+
+    expect(await canDeleteProject("user-1", "proj-1")).toBe(true);
+    expect(projectRole.findFirst).not.toHaveBeenCalled();
+  });
+
+  it("allows that project's Leader Produksi Video even without super admin", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
+    user.findUnique.mockResolvedValue({ id: "user-1", isSuperAdmin: false });
+    projectRole.findFirst.mockResolvedValue({
+      projectId: "proj-1",
+      userId: "user-1",
+      role: "LEADER_PRODUKSI_VIDEO",
+    });
+
+    expect(await canDeleteProject("user-1", "proj-1")).toBe(true);
+  });
+
+  it("denies a non-super-admin who isn't that project's Leader Produksi Video", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
+    user.findUnique.mockResolvedValue({ id: "user-1", isSuperAdmin: false });
+    projectRole.findFirst.mockResolvedValue(null);
+
+    expect(await canDeleteProject("user-1", "proj-1")).toBe(false);
+  });
+
+  it("denies a user holding another role (e.g. TIM_PRODUKSI) on the project", async () => {
+    workspaceSettings.findUnique.mockResolvedValue({ id: 1, mode: "TIM" });
+    user.findUnique.mockResolvedValue({ id: "user-1", isSuperAdmin: false });
+    // findFirst is scoped to role: LEADER_PRODUKSI_VIDEO, so a TIM_PRODUKSI-only
+    // user finds no matching row.
+    projectRole.findFirst.mockResolvedValue(null);
+
+    expect(await canDeleteProject("user-1", "proj-1")).toBe(false);
   });
 });

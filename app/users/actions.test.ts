@@ -20,6 +20,7 @@ vi.mock("@/lib/prisma", () => ({
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      findUnique: vi.fn(),
     },
   },
 }));
@@ -32,6 +33,7 @@ const user = prisma.user as unknown as {
   create: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
   delete: ReturnType<typeof vi.fn>;
+  findUnique: ReturnType<typeof vi.fn>;
 };
 const requireSessionMock = requireSession as unknown as ReturnType<typeof vi.fn>;
 const resolveUserIdMock = resolveUserId as unknown as ReturnType<typeof vi.fn>;
@@ -55,6 +57,7 @@ beforeEach(() => {
   user.create.mockReset();
   user.update.mockReset();
   user.delete.mockReset();
+  user.findUnique.mockReset().mockResolvedValue({ id: "current-user", isSuperAdmin: false });
   requireSessionMock.mockReset().mockResolvedValue({ user: { id: "current-user" } });
   resolveUserIdMock.mockReset().mockResolvedValue("current-user");
 });
@@ -109,6 +112,30 @@ describe("updateUserAction", () => {
     const data = user.update.mock.calls[0][0].data;
     expect(data.passwordHash).toBeDefined();
     expect(data.passwordHash).not.toBe("newpassword123");
+  });
+
+  it("ignores isSuperAdmin from the form when the current user isn't a super admin", async () => {
+    user.findUnique.mockResolvedValue({ id: "current-user", isSuperAdmin: false });
+
+    await updateUserAction("user-1", formData({ email: "a@b.com", isSuperAdmin: "on" }));
+
+    expect(user.update.mock.calls[0][0].data.isSuperAdmin).toBeUndefined();
+  });
+
+  it("applies isSuperAdmin from the form when the current user is a super admin", async () => {
+    user.findUnique.mockResolvedValue({ id: "current-user", isSuperAdmin: true });
+
+    await updateUserAction("user-1", formData({ email: "a@b.com", isSuperAdmin: "on" }));
+
+    expect(user.update.mock.calls[0][0].data.isSuperAdmin).toBe(true);
+  });
+
+  it("a super admin can also revoke isSuperAdmin by omitting the checkbox", async () => {
+    user.findUnique.mockResolvedValue({ id: "current-user", isSuperAdmin: true });
+
+    await updateUserAction("user-1", formData({ email: "a@b.com" }));
+
+    expect(user.update.mock.calls[0][0].data.isSuperAdmin).toBe(false);
   });
 });
 
