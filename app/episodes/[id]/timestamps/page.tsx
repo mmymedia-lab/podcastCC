@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { canUnlockEpisodePascaProduksi, getEpisodePascaProduksiGate } from "@/lib/permissions";
 import { createTimestampMarkerAction, deleteTimestampMarkerAction } from "./actions";
+import { lockEpisodePascaProduksiAction, unlockEpisodePascaProduksiAction } from "@/app/episodes/actions";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { PascaProduksiGateNotice } from "@/components/ui/PascaProduksiGateNotice";
 import {
   BUTTON_DANGER,
   BUTTON_PRIMARY,
@@ -25,7 +28,7 @@ export default async function TimestampsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireSession();
+  const session = await requireSession();
   const { id: episodeId } = await params;
 
   const episode = await prisma.episode.findUnique({ where: { id: episodeId } });
@@ -35,6 +38,10 @@ export default async function TimestampsPage({
     where: { episodeId },
     orderBy: { createdAt: "asc" },
   });
+
+  const userId = await resolveUserId(session);
+  const pascaProduksiGate = await getEpisodePascaProduksiGate(episodeId);
+  const canTogglePascaProduksi = userId ? await canUnlockEpisodePascaProduksi(userId, episodeId) : false;
 
   return (
     <main className={PAGE}>
@@ -47,6 +54,15 @@ export default async function TimestampsPage({
         ]}
       />
       <h1 className={H1}>Timestamp/Chapter: {episode.title}</h1>
+
+      <PascaProduksiGateNotice
+        unlocked={pascaProduksiGate.unlocked}
+        productionDate={pascaProduksiGate.productionDate}
+        manualOverride={pascaProduksiGate.manualOverride}
+        canToggle={canTogglePascaProduksi}
+        unlockAction={unlockEpisodePascaProduksiAction.bind(null, episodeId)}
+        lockAction={lockEpisodePascaProduksiAction.bind(null, episodeId)}
+      />
 
       <ul className={CARD_LIST}>
         {markers.map((marker) => (

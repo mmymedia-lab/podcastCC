@@ -1,15 +1,23 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EpisodeStage } from "@prisma/client";
-import { requireSession } from "@/lib/session";
+import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getWorkspaceSettings } from "@/lib/workspace-settings";
+import { canUnlockEpisodePascaProduksi, getEpisodePascaProduksiGate } from "@/lib/permissions";
 import { STAGE_LABELS, STAGE_ORDER } from "../stages";
 import { PHASE_BADGE_STYLE, PHASE_BORDER_STYLE, STAGE_TO_PHASE } from "../phases";
-import { updateEpisodeHostAction, updateEpisodeStageAction, updateRecordingScheduleAction } from "../actions";
+import {
+  lockEpisodePascaProduksiAction,
+  unlockEpisodePascaProduksiAction,
+  updateEpisodeHostAction,
+  updateEpisodeStageAction,
+  updateRecordingScheduleAction,
+} from "../actions";
 import { StageBadge } from "@/components/ui/StageBadge";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { PhaseLegend } from "@/components/ui/PhaseLegend";
+import { PascaProduksiGateNotice } from "@/components/ui/PascaProduksiGateNotice";
 import { BUTTON_PRIMARY, CARD, FIELD_GROUP, H1, H2, INPUT, LABEL, PAGE_WIDE } from "@/lib/ui-classes";
 
 function toDatetimeLocalValue(date: Date | null): string {
@@ -25,7 +33,7 @@ export default async function EpisodeDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireSession();
+  const session = await requireSession();
   const { id } = await params;
 
   const episode = await prisma.episode.findUnique({ where: { id } });
@@ -33,6 +41,10 @@ export default async function EpisodeDetailPage({
 
   const settings = await getWorkspaceSettings();
   const hosts = await prisma.host.findMany({ orderBy: { name: "asc" } });
+
+  const userId = await resolveUserId(session);
+  const pascaProduksiGate = await getEpisodePascaProduksiGate(id);
+  const canTogglePascaProduksi = userId ? await canUnlockEpisodePascaProduksi(userId, id) : false;
 
   // `stage` here is whichever stage each sub-page's own edit actions gate
   // on (see requireEditableStage()/canEditStage() calls in each section's
@@ -138,6 +150,14 @@ export default async function EpisodeDetailPage({
       </ol>
 
       <h2 className={H2}>Detail Tahap</h2>
+      <PascaProduksiGateNotice
+        unlocked={pascaProduksiGate.unlocked}
+        productionDate={pascaProduksiGate.productionDate}
+        manualOverride={pascaProduksiGate.manualOverride}
+        canToggle={canTogglePascaProduksi}
+        unlockAction={unlockEpisodePascaProduksiAction.bind(null, episode.id)}
+        lockAction={lockEpisodePascaProduksiAction.bind(null, episode.id)}
+      />
       <div className="grid gap-3 sm:grid-cols-2">
         {stageLinks.map((link) => (
           <Link

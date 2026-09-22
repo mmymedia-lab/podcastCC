@@ -1,8 +1,11 @@
 import { notFound } from "next/navigation";
-import { requireSession } from "@/lib/session";
+import { requireSession, resolveUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { canUnlockEpisodePascaProduksi, getEpisodePascaProduksiGate } from "@/lib/permissions";
+import { lockEpisodePascaProduksiAction, unlockEpisodePascaProduksiAction } from "@/app/episodes/actions";
 import { ShowNotesForm } from "./show-notes-form";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { PascaProduksiGateNotice } from "@/components/ui/PascaProduksiGateNotice";
 import { H1, PAGE } from "@/lib/ui-classes";
 
 export default async function ShowNotesPage({
@@ -10,7 +13,7 @@ export default async function ShowNotesPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireSession();
+  const session = await requireSession();
   const { id: episodeId } = await params;
 
   const episode = await prisma.episode.findUnique({ where: { id: episodeId } });
@@ -21,6 +24,10 @@ export default async function ShowNotesPage({
     orderBy: { order: "asc" },
   });
   const outlineText = outlineItems.map((item) => `- ${item.content}`).join("\n");
+
+  const userId = await resolveUserId(session);
+  const pascaProduksiGate = await getEpisodePascaProduksiGate(episodeId);
+  const canTogglePascaProduksi = userId ? await canUnlockEpisodePascaProduksi(userId, episodeId) : false;
 
   return (
     <main className={PAGE}>
@@ -33,6 +40,15 @@ export default async function ShowNotesPage({
         ]}
       />
       <h1 className={H1}>Show Notes: {episode.title}</h1>
+
+      <PascaProduksiGateNotice
+        unlocked={pascaProduksiGate.unlocked}
+        productionDate={pascaProduksiGate.productionDate}
+        manualOverride={pascaProduksiGate.manualOverride}
+        canToggle={canTogglePascaProduksi}
+        unlockAction={unlockEpisodePascaProduksiAction.bind(null, episodeId)}
+        lockAction={lockEpisodePascaProduksiAction.bind(null, episodeId)}
+      />
 
       <ShowNotesForm
         episodeId={episodeId}

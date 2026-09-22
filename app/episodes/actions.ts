@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
-import { requireEditableStage } from "@/lib/permissions";
+import { requireCanUnlockEpisodePascaProduksi, requireEditableStage } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { EpisodeStage } from "@prisma/client";
 import { STAGE_ORDER } from "./stages";
@@ -78,4 +78,26 @@ export async function updateEpisodeStageAction(episodeId: string, formData: Form
   revalidatePath(`/episodes/${episodeId}`);
   revalidatePath("/episodes");
   revalidatePath("/board");
+}
+
+export async function unlockEpisodePascaProduksiAction(episodeId: string) {
+  await requireCanUnlockEpisodePascaProduksi(episodeId);
+
+  await prisma.episode.update({ where: { id: episodeId }, data: { pascaProduksiUnlocked: true } });
+
+  revalidatePath(`/episodes/${episodeId}`);
+  revalidatePath(`/episodes/${episodeId}/checklist/pasca-produksi`);
+  revalidatePath(`/episodes/${episodeId}/timestamps`);
+  revalidatePath(`/episodes/${episodeId}/show-notes`);
+}
+
+export async function lockEpisodePascaProduksiAction(episodeId: string) {
+  await requireCanUnlockEpisodePascaProduksi(episodeId);
+
+  await prisma.episode.update({ where: { id: episodeId }, data: { pascaProduksiUnlocked: false } });
+
+  revalidatePath(`/episodes/${episodeId}`);
+  revalidatePath(`/episodes/${episodeId}/checklist/pasca-produksi`);
+  revalidatePath(`/episodes/${episodeId}/timestamps`);
+  revalidatePath(`/episodes/${episodeId}/show-notes`);
 }

@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
-import { requireCanDeleteProject, requireEditableProjectStage } from "@/lib/permissions";
+import {
+  requireCanDeleteProject,
+  requireCanUnlockProjectPascaProduksi,
+  requireEditableProjectStage,
+} from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { ProjectStage } from "@prisma/client";
 import { STAGE_ORDER } from "./stages";
@@ -87,4 +91,22 @@ export async function deleteProjectAction(id: string) {
   await prisma.project.delete({ where: { id } });
   revalidatePath("/videos");
   redirect("/videos");
+}
+
+export async function unlockProjectPascaProduksiAction(id: string) {
+  await requireCanUnlockProjectPascaProduksi(id);
+
+  await prisma.project.update({ where: { id }, data: { pascaProduksiUnlocked: true } });
+
+  revalidatePath(`/videos/${id}`);
+  revalidatePath(`/videos/${id}/edit-versions`);
+}
+
+export async function lockProjectPascaProduksiAction(id: string) {
+  await requireCanUnlockProjectPascaProduksi(id);
+
+  await prisma.project.update({ where: { id }, data: { pascaProduksiUnlocked: false } });
+
+  revalidatePath(`/videos/${id}`);
+  revalidatePath(`/videos/${id}/edit-versions`);
 }
