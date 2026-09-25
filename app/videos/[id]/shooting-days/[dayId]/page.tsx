@@ -26,6 +26,10 @@ function formatScheduledDate(date: Date | null): string {
   return date.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 }
 
+function formatNoteTime(date: Date): string {
+  return date.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+}
+
 export default async function ShootingDayDetailPage({
   params,
 }: {
@@ -105,7 +109,14 @@ export default async function ShootingDayDetailPage({
                 <p className="text-sm text-slate-900">
                   {note.slate && <span className="font-medium">Slate {note.slate} </span>}
                   {note.takeNumber !== null && <span className="font-medium">Take {note.takeNumber} </span>}
-                  {note.isGood && <span className="text-emerald-700">✓ OK</span>}
+                  {note.isGood ? (
+                    <span className="text-emerald-700">✓ OK</span>
+                  ) : (
+                    <span className="text-danger-700">✗ NG</span>
+                  )}
+                  <span className="ml-2 text-xs font-normal text-slate-400">
+                    {formatNoteTime(note.createdAt)}
+                  </span>
                 </p>
                 <p className="mt-1 whitespace-pre-wrap text-sm text-slate-600">{note.notes}</p>
                 <form
