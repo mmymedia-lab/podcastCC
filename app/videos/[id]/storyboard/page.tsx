@@ -19,7 +19,7 @@ import {
   H2,
   INPUT,
   LABEL,
-  PAGE,
+  PAGE_FULL,
 } from "@/lib/ui-classes";
 
 export default async function StoryboardPage({
@@ -39,7 +39,7 @@ export default async function StoryboardPage({
   });
 
   return (
-    <main className={PAGE}>
+    <main className={PAGE_FULL}>
       <Breadcrumb
         items={[
           { label: "Beranda", href: "/dashboard" },
@@ -50,9 +50,13 @@ export default async function StoryboardPage({
       />
       <h1 className={H1}>Storyboard: {project.title}</h1>
 
-      <DriveFolderNotice driveFolderUrl={project.driveFolderUrl} />
-
-      <AiStoryboardPromptAssist />
+      {/* Gallery grid uses the full page width (like the Kanban board), but
+          the notice/assist/form below stay narrow — a full-width textarea
+          or input would just make them harder to read. */}
+      <div className="max-w-2xl">
+        <DriveFolderNotice driveFolderUrl={project.driveFolderUrl} />
+        <AiStoryboardPromptAssist />
+      </div>
 
       {items.length === 0 ? (
         <p className={EMPTY_STATE}>Belum ada frame storyboard.</p>
@@ -65,31 +69,33 @@ export default async function StoryboardPage({
         />
       )}
 
-      <h2 className={H2}>Tambah Frame</h2>
-      <form action={createStoryboardFrameAction.bind(null, projectId)} className={FORM}>
-        <div className={FIELD_GROUP}>
-          <label htmlFor="driveUrl" className={LABEL}>
-            Link Google Drive
-          </label>
-          <input
-            id="driveUrl"
-            name="driveUrl"
-            type="url"
-            placeholder="https://drive.google.com/..."
-            required
-            className={INPUT}
-          />
-        </div>
-        <div className={FIELD_GROUP}>
-          <label htmlFor="notes" className={LABEL}>
-            Catatan
-          </label>
-          <input id="notes" name="notes" className={INPUT} />
-        </div>
-        <button type="submit" className={BUTTON_PRIMARY}>
-          Tambah
-        </button>
-      </form>
+      <div className="max-w-2xl">
+        <h2 className={H2}>Tambah Frame</h2>
+        <form action={createStoryboardFrameAction.bind(null, projectId)} className={FORM}>
+          <div className={FIELD_GROUP}>
+            <label htmlFor="driveUrl" className={LABEL}>
+              Link Google Drive
+            </label>
+            <input
+              id="driveUrl"
+              name="driveUrl"
+              type="url"
+              placeholder="https://drive.google.com/..."
+              required
+              className={INPUT}
+            />
+          </div>
+          <div className={FIELD_GROUP}>
+            <label htmlFor="notes" className={LABEL}>
+              Catatan
+            </label>
+            <input id="notes" name="notes" className={INPUT} />
+          </div>
+          <button type="submit" className={BUTTON_PRIMARY}>
+            Tambah
+          </button>
+        </form>
+      </div>
     </main>
   );
 }
